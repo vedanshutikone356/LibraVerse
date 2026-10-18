@@ -1,0 +1,266 @@
+{% extends "base.html" %}
+
+{% block title %}Deep Analytics & Statistical Engine — LibraVerse Admin{% endblock %}
+
+{% block content %}
+<div class="admin-layout">
+    
+    <!-- Sidebar -->
+    <aside class="admin-sidebar">
+        <div class="mb-4 px-2">
+            <span class="badge-cyber badge-category mb-1" style="font-size: 0.65rem;">ADMINISTRATOR CONSOLE</span>
+            <h6 class="fw-bold text-white mb-0">{{ current_admin }}</h6>
+            <span class="text-secondary small">@{{ current_admin_username }}</span>
+        </div>
+
+        <ul class="admin-sidebar-menu">
+            <li class="admin-nav-item">
+                <a href="{{ url_for('dashboard') }}"><i class="bi bi-speedometer2 text-info"></i> Overview</a>
+            </li>
+            <li class="admin-nav-item">
+                <a href="{{ url_for('manage_books') }}"><i class="bi bi-book text-primary"></i> Manage Books</a>
+            </li>
+            <li class="admin-nav-item">
+                <a href="{{ url_for('manage_members') }}"><i class="bi bi-people text-success"></i> Manage Members</a>
+            </li>
+            <li class="admin-nav-item">
+                <a href="{{ url_for('issue_return') }}"><i class="bi bi-arrow-left-right text-warning"></i> Issue & Return</a>
+            </li>
+            <li class="admin-nav-item">
+                <a href="{{ url_for('borrowing_history') }}"><i class="bi bi-clock-history text-light"></i> Borrowing History</a>
+            </li>
+            <li class="admin-nav-item active">
+                <a href="{{ url_for('analytics') }}"><i class="bi bi-graph-up-arrow text-danger"></i> Deep Analytics</a>
+            </li>
+            <li class="my-3 border-top border-secondary border-opacity-25"></li>
+            <li class="admin-nav-item">
+                <a href="{{ url_for('export_data', export_type='comprehensive', fmt='excel') }}" class="text-emerald">
+                    <i class="bi bi-file-earmark-excel-fill text-emerald"></i> Export Analytics (Excel)
+                </a>
+            </li>
+        </ul>
+    </aside>
+
+    <!-- Main Content -->
+    <section class="admin-content">
+        
+        <div class="d-flex flex-column flex-md-row justify-content-between align-items-md-center mb-4 gap-3">
+            <div>
+                <h1 class="h3 fw-bold text-white mb-1">
+                    <i class="bi bi-cpu-fill text-cyan me-2"></i> Python Analytics & Statistical Engine
+                </h1>
+                <p class="text-secondary small mb-0">Powered by Pandas DataFrames and NumPy numerical matrix algorithms.</p>
+            </div>
+            
+            <a href="{{ url_for('export_data', export_type='comprehensive', fmt='excel') }}" class="btn-cyber-cyan btn-cyber-sm">
+                <i class="bi bi-file-earmark-excel me-1"></i> Download Multi-Sheet Workbook
+            </a>
+        </div>
+
+        <!-- NumPy Statistical Indicator Cards -->
+        <div class="row g-3 mb-4">
+            
+            <!-- NumPy Mean Monthly Borrows -->
+            <div class="col-xl-3 col-sm-6">
+                <div class="glass-panel p-3 h-100 glass-panel-hover">
+                    <div class="d-flex justify-content-between align-items-center mb-1">
+                        <span class="text-secondary small fw-semibold">MEAN MONTHLY BORROWS</span>
+                        <span class="badge-cyber badge-category" style="font-size: 0.65rem;">np.mean</span>
+                    </div>
+                    <h3 class="fw-bold mb-0 text-cyan">{{ monthly_trends.mean_monthly }}</h3>
+                    <span class="text-muted small">Standard deviation: &plusmn;{{ monthly_trends.std_monthly }}</span>
+                </div>
+            </div>
+
+            <!-- NumPy Median Monthly Borrows -->
+            <div class="col-xl-3 col-sm-6">
+                <div class="glass-panel p-3 h-100 glass-panel-hover">
+                    <div class="d-flex justify-content-between align-items-center mb-1">
+                        <span class="text-secondary small fw-semibold">MEDIAN MONTHLY</span>
+                        <span class="badge-cyber badge-category" style="font-size: 0.65rem;">np.median</span>
+                    </div>
+                    <h3 class="fw-bold mb-0 text-white">{{ monthly_trends.median_monthly }}</h3>
+                    <span class="text-muted small">Peak: {{ monthly_trends.max_monthly }} | Min: {{ monthly_trends.min_monthly }}</span>
+                </div>
+            </div>
+
+            <!-- NumPy Average Loan Duration -->
+            <div class="col-xl-3 col-sm-6">
+                <div class="glass-panel p-3 h-100 glass-panel-hover">
+                    <div class="d-flex justify-content-between align-items-center mb-1">
+                        <span class="text-secondary small fw-semibold">AVG LOAN DURATION</span>
+                        <span class="badge-cyber badge-category" style="font-size: 0.65rem;">NumPy</span>
+                    </div>
+                    <h3 class="fw-bold mb-0 text-emerald">{{ duration_stats.avg_duration }} <small class="fs-6 text-muted">days</small></h3>
+                    <span class="text-muted small">90th Percentile: {{ duration_stats.p90_duration }} days</span>
+                </div>
+            </div>
+
+            <!-- Overdue Ratio -->
+            <div class="col-xl-3 col-sm-6">
+                <div class="glass-panel p-3 h-100 glass-panel-hover">
+                    <div class="d-flex justify-content-between align-items-center mb-1">
+                        <span class="text-secondary small fw-semibold">OVERDUE INCIDENCE</span>
+                        <span class="badge-cyber badge-category" style="font-size: 0.65rem;">Risk Rate</span>
+                    </div>
+                    <h3 class="fw-bold mb-0 {% if duration_stats.overdue_rate > 15 %}text-warning{% else %}text-white{% endif %}">
+                        {{ duration_stats.overdue_rate }}%
+                    </h3>
+                    <span class="text-muted small">Overall overdue rate</span>
+                </div>
+            </div>
+
+        </div>
+
+        <!-- Charts Grid -->
+        <div class="row g-4 mb-4">
+            
+            <!-- Monthly Trends with Trend Slope -->
+            <div class="col-lg-7">
+                <div class="glass-panel p-4 h-100">
+                    <div class="d-flex justify-content-between align-items-center mb-3">
+                        <div>
+                            <h6 class="fw-bold text-white mb-0">Monthly Circulation Trends</h6>
+                            <span class="text-secondary small">NumPy Polyfit Linear Slope: 
+                                <strong class="{% if monthly_trends.trend_slope >= 0 %}text-emerald{% else %}text-rose{% endif %}">
+                                    {{ monthly_trends.trend_slope }}
+                                </strong>
+                            </span>
+                        </div>
+                        <span class="badge-cyber badge-category">Time Series</span>
+                    </div>
+                    <div style="height: 290px; position: relative;">
+                        <canvas id="monthlyTrendsChart"></canvas>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Loan Duration Bins (NumPy Histogram) -->
+            <div class="col-lg-5">
+                <div class="glass-panel p-4 h-100">
+                    <div class="d-flex justify-content-between align-items-center mb-3">
+                        <div>
+                            <h6 class="fw-bold text-white mb-0">Loan Duration Distribution</h6>
+                            <span class="text-secondary small">NumPy Histogram Binning</span>
+                        </div>
+                        <span class="badge-cyber badge-category">Binned</span>
+                    </div>
+                    <div style="height: 290px; position: relative;">
+                        <canvas id="durationDistributionChart"></canvas>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Inventory Breakdown by Category -->
+            <div class="col-lg-6">
+                <div class="glass-panel p-4 h-100">
+                    <div class="d-flex justify-content-between align-items-center mb-3">
+                        <h6 class="fw-bold text-white mb-0">Physical Copies: Available vs In Circulation</h6>
+                        <span class="badge-cyber badge-category">Categorical</span>
+                    </div>
+                    <div style="height: 280px; position: relative;">
+                        <canvas id="copiesComparisonChart"></canvas>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Category Share Donut -->
+            <div class="col-lg-6">
+                <div class="glass-panel p-4 h-100">
+                    <div class="d-flex justify-content-between align-items-center mb-3">
+                        <h6 class="fw-bold text-white mb-0">Catalog Title Density</h6>
+                        <span class="badge-cyber badge-category">Share</span>
+                    </div>
+                    <div style="height: 280px; position: relative;">
+                        <canvas id="categoryDistributionChart"></canvas>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+
+        <!-- Pandas Aggregation Matrix Table -->
+        <div class="glass-panel p-4 mb-4">
+            <div class="d-flex justify-content-between align-items-center mb-3">
+                <div>
+                    <h5 class="fw-bold text-white mb-1">Pandas Category Utilization Matrix</h5>
+                    <p class="text-secondary small mb-0">Computed via <code>DataFrame.groupby('category').agg(...)</code></p>
+                </div>
+                <a href="{{ url_for('export_data', export_type='books', fmt='csv') }}" class="btn-cyber-outline btn-cyber-sm">
+                    <i class="bi bi-download me-1"></i> Export Data
+                </a>
+            </div>
+
+            <div class="cyber-table-container">
+                <table class="cyber-table">
+                    <thead>
+                        <tr>
+                            <th>Category</th>
+                            <th>Unique Titles</th>
+                            <th>Total Inventory</th>
+                            <th>Available Copies</th>
+                            <th>Issued Copies</th>
+                            <th>Total Borrow Events</th>
+                            <th>Circulation Rate</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for row in category_data.table_data %}
+                            <tr>
+                                <td class="fw-bold text-white">
+                                    <span class="badge-cyber badge-category me-2">{{ row.category }}</span>
+                                </td>
+                                <td class="text-secondary">{{ row.title_count }}</td>
+                                <td class="fw-semibold text-white">{{ row.total_copies }}</td>
+                                <td class="text-emerald">{{ row.available_copies }}</td>
+                                <td class="text-warning">{{ row.issued_copies }}</td>
+                                <td class="text-cyan fw-bold">{{ row.borrow_count }}</td>
+                                <td>
+                                    <div class="d-flex align-items-center gap-2">
+                                        <div class="progress flex-grow-1" style="height: 6px; background: rgba(255,255,255,0.1);">
+                                            <div class="progress-bar bg-info" role="progressbar" style="width: {{ row.utilization_rate }}%;" aria-valuenow="{{ row.utilization_rate }}" aria-valuemin="0" aria-valuemax="100"></div>
+                                        </div>
+                                        <span class="small text-secondary">{{ row.utilization_rate }}%</span>
+                                    </div>
+                                </td>
+                            </tr>
+                        {% else %}
+                            <tr>
+                                <td colspan="7" class="text-center py-4 text-muted">No category analytical records to display.</td>
+                            </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+    </section>
+
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script src="{{ url_for('static', filename='js/dashboard.js') }}"></script>
+<script>
+    window.categoryChartData = {
+        labels: {{ category_data.labels | tojson }},
+        counts: {{ category_data.title_counts | tojson }}
+    };
+
+    window.copiesChartData = {
+        labels: {{ category_data.labels | tojson }},
+        available: {{ category_data.available_copies | tojson }},
+        issued: {{ category_data.issued_copies | tojson }}
+    };
+
+    window.monthlyTrendsChartData = {
+        labels: {{ monthly_trends.labels | tojson }},
+        counts: {{ monthly_trends.counts | tojson }}
+    };
+
+    window.durationDistributionData = {
+        labels: {{ duration_stats.distribution_labels | tojson }},
+        counts: {{ duration_stats.distribution_counts | tojson }}
+    };
+</script>
+{% endblock %}

@@ -1,0 +1,114 @@
+{% extends "base.html" %}
+
+{% block title %}About LibraVerse — Architecture & Technologies{% endblock %}
+
+{% block content %}
+<div class="container py-4 py-lg-5">
+    
+    <!-- Hero / Title -->
+    <div class="text-center mb-5 reveal">
+        <span class="badge-cyber badge-category mb-2">ARCHITECTURAL BLUEPRINT</span>
+        <h1 class="display-5 fw-bold text-white mb-3">About LibraVerse</h1>
+        <p class="lead text-secondary mx-auto" style="max-width: 680px;">
+            A premier Virtual Library Management System engineered to fuse robust Python database computing with cinematic 3D web presentation.
+        </p>
+    </div>
+
+    <!-- Tech Stack Cards -->
+    <div class="row g-4 mb-5">
+        
+        <div class="col-lg-3 col-md-6 reveal reveal-delay-100">
+            <div class="glass-panel p-4 h-100 glass-panel-hover">
+                <div class="p-3 rounded-3 mb-3 d-inline-block" style="background: rgba(139, 92, 246, 0.15); color: var(--primary-purple);">
+                    <i class="bi bi-filetype-py fs-2"></i>
+                </div>
+                <h5 class="fw-bold text-white mb-2">Flask & Python 3.13</h5>
+                <p class="text-secondary small mb-0">
+                    High-performance WSGI routing, secure session authentication, parameterized SQL queries, and modular service-layer separation.
+                </p>
+            </div>
+        </div>
+
+        <div class="col-lg-3 col-md-6 reveal reveal-delay-200">
+            <div class="glass-panel p-4 h-100 glass-panel-hover">
+                <div class="p-3 rounded-3 mb-3 d-inline-block" style="background: rgba(34, 211, 238, 0.15); color: var(--accent-cyan);">
+                    <i class="bi bi-database-fill-gear fs-2"></i>
+                </div>
+                <h5 class="fw-bold text-white mb-2">SQLite3 Persistent DB</h5>
+                <p class="text-secondary small mb-0">
+                    ACID-compliant relational engine with enforced foreign keys, copy range constraints, atomic transactions, and custom indices.
+                </p>
+            </div>
+        </div>
+
+        <div class="col-lg-3 col-md-6 reveal reveal-delay-300">
+            <div class="glass-panel p-4 h-100 glass-panel-hover">
+                <div class="p-3 rounded-3 mb-3 d-inline-block" style="background: rgba(236, 72, 153, 0.15); color: #EC4899;">
+                    <i class="bi bi-bar-chart-line-fill fs-2"></i>
+                </div>
+                <h5 class="fw-bold text-white mb-2">Pandas & NumPy</h5>
+                <p class="text-secondary small mb-0">
+                    DataFrames for inventory aggregation, popularity ranking, time-series monthly trends, and dispersion calculations (mean, std, 90th percentile).
+                </p>
+            </div>
+        </div>
+
+        <div class="col-lg-3 col-md-6 reveal reveal-delay-400">
+            <div class="glass-panel p-4 h-100 glass-panel-hover">
+                <div class="p-3 rounded-3 mb-3 d-inline-block" style="background: rgba(16, 185, 129, 0.15); color: #10B981;">
+                    <i class="bi bi-boxes fs-2"></i>
+                </div>
+                <h5 class="fw-bold text-white mb-2">3D Spatial Physics</h5>
+                <p class="text-secondary small mb-0">
+                    Hardware-accelerated CSS 3D transforms, perspective depths, simulated book spines, and cursor-follow mouse parallax.
+                </p>
+            </div>
+        </div>
+
+    </div>
+
+    <!-- Features & Capabilities -->
+    <div class="glass-panel p-4 p-lg-5 mb-5 reveal">
+        <h3 class="fw-bold mb-4 text-white">Core System Features</h3>
+        <div class="row g-4">
+            <div class="col-md-6">
+                <div class="d-flex gap-3">
+                    <i class="bi bi-check-circle-fill text-info fs-5 flex-shrink-0 mt-1"></i>
+                    <div>
+                        <h6 class="fw-bold text-white mb-1">Book Catalog & Deep Search</h6>
+                        <p class="text-secondary small">Case-insensitive multi-field search across titles, authors, categories, and ISBNs with multi-facet category and availability filters.</p>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-6">
+                <div class="d-flex gap-3">
+                    <i class="bi bi-check-circle-fill text-info fs-5 flex-shrink-0 mt-1"></i>
+                    <div>
+                        <h6 class="fw-bold text-white mb-1">Automated Circulation Control</h6>
+                        <p class="text-secondary small">Transactional issuance and returns that adjust available inventory atomically, preventing negative stock or over-returns.</p>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-6">
+                <div class="d-flex gap-3">
+                    <i class="bi bi-check-circle-fill text-info fs-5 flex-shrink-0 mt-1"></i>
+                    <div>
+                        <h6 class="fw-bold text-white mb-1">Overdue Detection & Fines</h6>
+                        <p class="text-secondary small">Automated due date auditing calculating exact overdue days and fine assessments with dynamic status reconciliation.</p>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-6">
+                <div class="d-flex gap-3">
+                    <i class="bi bi-check-circle-fill text-info fs-5 flex-shrink-0 mt-1"></i>
+                    <div>
+                        <h6 class="fw-bold text-white mb-1">Pandas & Excel Reports</h6>
+                        <p class="text-secondary small">Instant generation of UTF-8 CSV exports and multi-tab Excel workbooks powered by Pandas and openpyxl.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+</div>
+{% endblock %}

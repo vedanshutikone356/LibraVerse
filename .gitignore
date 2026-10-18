@@ -1,0 +1,70 @@
+# ==========================================
+# LibraVerse Git Ignore Configuration
+# ==========================================
+
+# Virtual Environments
+venv/
+.venv/
+env/
+ENV/
+env.bak/
+venv.bak/
+
+# Byte-compiled / optimized / DLL files
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+
+# Environment variables & secrets
+.env
+.env.*
+*.env
+*.secret
+
+# SQLite Databases & Local Storage
+instance/*.db
+instance/*.sqlite
+instance/*.sqlite3
+*.db
+*.sqlite
+*.sqlite3
+!instance/.gitkeep
+
+# Generated Exports
+exports/*.csv
+exports/*.xlsx
+!exports/.gitkeep
+
+# Pytest & Coverage
+.pytest_cache/
+.coverage
+.coverage.*
+htmlcov/
+nosetests.xml
+coverage.xml
+*.cover
+
+# IDEs and Editors
+.vscode/
+.idea/
+*.sublime-project
+*.sublime-workspace
+*.swp
+*.swo
+*~
+
+# Operating System Files
+.DS_Store
+Thumbs.db
+ehthumbs.db
+[Dd]esktop.ini
+
+# Build / Distribution
+build/
+dist/
+*.egg-info/
+.eggs/
+
+# Unrelated nested project directory
+IIT G/

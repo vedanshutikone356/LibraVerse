@@ -1,0 +1,129 @@
+{% extends "base.html" %}
+
+{% block title %}{{ book.title }} — LibraVerse{% endblock %}
+
+{% block content %}
+<div class="container py-4 py-lg-5">
+    
+    <!-- Breadcrumb & Back -->
+    <div class="d-flex align-items-center justify-content-between mb-4">
+        <a href="{{ url_for('books_catalog') }}" class="btn-cyber-outline btn-cyber-sm">
+            <i class="bi bi-arrow-left"></i> Return to Catalog
+        </a>
+        <div class="d-flex gap-2">
+            <span class="badge-cyber badge-category">{{ book.category }}</span>
+            {% if book.available_copies > 0 %}
+                <span class="badge-cyber badge-available">{{ book.available_copies }} Copies Available</span>
+            {% else %}
+                <span class="badge-cyber badge-unavailable">Checked Out</span>
+            {% endif %}
+        </div>
+    </div>
+
+    <!-- Main Detail Glass Panel -->
+    <div class="glass-panel p-4 p-lg-5 reveal">
+        <div class="row g-5 align-items-center">
+            
+            <!-- Left: 3D Book Interactive Showcase -->
+            <div class="col-lg-5 text-center">
+                <div class="book-3d-scene my-4">
+                    <div class="book-3d-object" style="transform: rotateY(-22deg) rotateX(10deg); width: 220px; height: 320px;">
+                        <div class="book-face-front">
+                            {% if book.cover_url %}
+                                <img src="{{ book.cover_url }}" alt="{{ book.title }}" onerror="window.handleImageError(this, '{{ book.title }}', '{{ book.author }}')">
+                            {% endif %}
+                            <div class="fallback-cover" {% if book.cover_url %}style="display: none;"{% endif %}>
+                                <div class="fallback-cover-cat">{{ book.category }}</div>
+                                <div class="fallback-cover-title fs-5">{{ book.title }}</div>
+                                <div class="fallback-cover-author fs-6">{{ book.author }}</div>
+                            </div>
+                            <div class="book-front-glare"></div>
+                        </div>
+                        <div class="book-face-spine" style="width: 36px;">
+                            <span class="book-spine-text">{{ book.title|truncate(22) }}</span>
+                        </div>
+                        <div class="book-face-pages" style="width: 34px;"></div>
+                        <div class="book-face-back"></div>
+                    </div>
+                    <div class="book-3d-shadow" style="width: 200px; bottom: -45px;"></div>
+                </div>
+                <p class="text-secondary small mt-3">
+                    <i class="bi bi-arrows-move me-1"></i> Interactive 3D Perspective Model
+                </p>
+            </div>
+
+            <!-- Right: Book Specifications & Circulation -->
+            <div class="col-lg-7">
+                <div class="mb-3">
+                    <span class="badge-cyber badge-category mb-2">{{ book.category }}</span>
+                    <h1 class="display-6 fw-bolder text-white mb-2">{{ book.title }}</h1>
+                    <h5 class="text-info mb-4">by {{ book.author }}</h5>
+                </div>
+
+                <!-- Stock & Availability Card -->
+                <div class="glass-panel p-4 mb-4" style="background: rgba(14, 14, 32, 0.75); border-color: var(--border-cyan);">
+                    <div class="row g-3 text-center">
+                        <div class="col-4 border-end border-secondary border-opacity-25">
+                            <span class="text-secondary small text-uppercase fw-semibold d-block">Total Inventory</span>
+                            <span class="fs-4 fw-bold text-white">{{ book.total_copies }}</span>
+                        </div>
+                        <div class="col-4 border-end border-secondary border-opacity-25">
+                            <span class="text-secondary small text-uppercase fw-semibold d-block">Available</span>
+                            <span class="fs-4 fw-bold text-emerald">{{ book.available_copies }}</span>
+                        </div>
+                        <div class="col-4">
+                            <span class="text-secondary small text-uppercase fw-semibold d-block">Checked Out</span>
+                            <span class="fs-4 fw-bold text-warning">{{ book.total_copies - book.available_copies }}</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Technical Metadata Table -->
+                <div class="glass-panel p-3 mb-4" style="background: rgba(14, 14, 30, 0.5);">
+                    <div class="row g-2 text-secondary small">
+                        <div class="col-sm-6">
+                            <strong class="text-white">ISBN Identifier:</strong> 
+                            <span class="text-cyan ms-1">{{ book.isbn }}</span>
+                        </div>
+                        <div class="col-sm-6">
+                            <strong class="text-white">Publication Year:</strong> 
+                            <span class="ms-1">{{ book.publication_year }}</span>
+                        </div>
+                        <div class="col-sm-6">
+                            <strong class="text-white">Publisher:</strong> 
+                            <span class="ms-1">{{ book.publisher }}</span>
+                        </div>
+                        <div class="col-sm-6">
+                            <strong class="text-white">Registered In System:</strong> 
+                            <span class="ms-1">{{ book.created_at[:10] if book.created_at else '2026-01-01' }}</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Overview Synopsis -->
+                <div class="mb-4">
+                    <h6 class="text-uppercase text-secondary small fw-bold tracking-wide mb-2">Synopsis & Abstract</h6>
+                    <p class="text-secondary leading-relaxed">
+                        {{ book.description or "No synopsis available for this volume." }}
+                    </p>
+                </div>
+
+                <!-- Admin Action shortcut if logged in -->
+                <div class="d-flex flex-wrap gap-3">
+                    <a href="{{ url_for('books_catalog') }}" class="btn-cyber-outline">
+                        <i class="bi bi-grid"></i> Browse More Books
+                    </a>
+                    {% if is_authenticated() %}
+                        <a href="{{ url_for('issue_return') }}" class="btn-cyber-primary">
+                            <i class="bi bi-box-arrow-right"></i> Issue This Book
+                        </a>
+                    {% endif %}
+                </div>
+
+            </div>
+
+        </div>
+    </div>
+
+</div>
+{% endblock %}

@@ -1,0 +1,178 @@
+{% extends "base.html" %}
+
+{% block title %}Borrowing Transaction History — LibraVerse Admin{% endblock %}
+
+{% block content %}
+<div class="admin-layout">
+    
+    <!-- Sidebar -->
+    <aside class="admin-sidebar">
+        <div class="mb-4 px-2">
+            <span class="badge-cyber badge-category mb-1" style="font-size: 0.65rem;">ADMINISTRATOR CONSOLE</span>
+            <h6 class="fw-bold text-white mb-0">{{ current_admin }}</h6>
+            <span class="text-secondary small">@{{ current_admin_username }}</span>
+        </div>
+
+        <ul class="admin-sidebar-menu">
+            <li class="admin-nav-item">
+                <a href="{{ url_for('dashboard') }}"><i class="bi bi-speedometer2 text-info"></i> Overview</a>
+            </li>
+            <li class="admin-nav-item">
+                <a href="{{ url_for('manage_books') }}"><i class="bi bi-book text-primary"></i> Manage Books</a>
+            </li>
+            <li class="admin-nav-item">
+                <a href="{{ url_for('manage_members') }}"><i class="bi bi-people text-success"></i> Manage Members</a>
+            </li>
+            <li class="admin-nav-item">
+                <a href="{{ url_for('issue_return') }}"><i class="bi bi-arrow-left-right text-warning"></i> Issue & Return</a>
+            </li>
+            <li class="admin-nav-item active">
+                <a href="{{ url_for('borrowing_history') }}"><i class="bi bi-clock-history text-light"></i> Borrowing History</a>
+            </li>
+            <li class="admin-nav-item">
+                <a href="{{ url_for('analytics') }}"><i class="bi bi-graph-up-arrow text-danger"></i> Deep Analytics</a>
+            </li>
+            <li class="my-3 border-top border-secondary border-opacity-25"></li>
+            <li class="admin-nav-item">
+                <a href="{{ url_for('export_data', export_type='borrowings', fmt='csv') }}" class="text-info"><i class="bi bi-filetype-csv"></i> Export History (CSV)</a>
+            </li>
+            <li class="admin-nav-item">
+                <a href="{{ url_for('export_data', export_type='borrowings', fmt='excel') }}" class="text-emerald"><i class="bi bi-file-earmark-excel"></i> Export History (Excel)</a>
+            </li>
+        </ul>
+    </aside>
+
+    <!-- Main Content -->
+    <section class="admin-content">
+        
+        <div class="d-flex flex-column flex-md-row justify-content-between align-items-md-center mb-4 gap-3">
+            <div>
+                <h1 class="h3 fw-bold text-white mb-1">Circulation Transactions Log</h1>
+                <p class="text-secondary small mb-0">Total records on ledger: {{ records|length }} transaction entries.</p>
+            </div>
+            
+            <div class="d-flex gap-2">
+                <a href="{{ url_for('export_data', export_type='borrowings', fmt='csv') }}" class="btn-cyber-outline btn-cyber-sm">
+                    <i class="bi bi-filetype-csv me-1"></i> CSV
+                </a>
+                <a href="{{ url_for('export_data', export_type='borrowings', fmt='excel') }}" class="btn-cyber-cyan btn-cyber-sm">
+                    <i class="bi bi-file-earmark-excel me-1"></i> Excel
+                </a>
+            </div>
+        </div>
+
+        <!-- Filter and Search Bar -->
+        <div class="glass-panel p-3 mb-4">
+            <form action="{{ url_for('borrowing_history') }}" method="GET" class="row g-2 align-items-center">
+                <div class="col-md-5">
+                    <div class="cyber-input-group">
+                        <i class="bi bi-search text-secondary ms-3 me-2"></i>
+                        <input type="text" name="search" class="cyber-input border-0 bg-transparent text-white" 
+                               placeholder="Search title, member, or ISBN..." value="{{ search }}">
+                        {% if search %}
+                            <a href="{{ url_for('borrowing_history', status=current_status) }}" class="text-secondary me-3"><i class="bi bi-x-circle-fill"></i></a>
+                        {% endif %}
+                    </div>
+                </div>
+                
+                <div class="col-md-3">
+                    <select name="status" class="cyber-input cyber-select small py-2" onchange="this.form.submit()">
+                        <option value="">All Statuses</option>
+                        <option value="Issued" {% if current_status == 'Issued' %}selected{% endif %}>Issued (Active)</option>
+                        <option value="Returned" {% if current_status == 'Returned' %}selected{% endif %}>Returned</option>
+                        <option value="Overdue" {% if current_status == 'Overdue' %}selected{% endif %}>Overdue</option>
+                    </select>
+                </div>
+
+                <div class="col-md-2">
+                    <select name="sort_by" class="cyber-input cyber-select small py-2" onchange="this.form.submit()">
+                        <option value="issue_date" {% if sort_by == 'issue_date' %}selected{% endif %}>Sort: Issue Date</option>
+                        <option value="due_date" {% if sort_by == 'due_date' %}selected{% endif %}>Sort: Due Date</option>
+                        <option value="id" {% if sort_by == 'id' %}selected{% endif %}>Sort: TX ID</option>
+                    </select>
+                </div>
+                
+                <div class="col-md-2 d-flex gap-2">
+                    <select name="order" class="cyber-input cyber-select small py-2" onchange="this.form.submit()">
+                        <option value="desc" {% if order == 'desc' %}selected{% endif %}>Desc</option>
+                        <option value="asc" {% if order == 'asc' %}selected{% endif %}>Asc</option>
+                    </select>
+                    {% if search or current_status %}
+                        <a href="{{ url_for('borrowing_history') }}" class="btn-cyber-outline btn-cyber-sm py-2 px-3" title="Clear Filters">
+                            <i class="bi bi-arrow-counterclockwise"></i>
+                        </a>
+                    {% endif %}
+                </div>
+            </form>
+        </div>
+
+        <!-- Transactions Table -->
+        <div class="glass-panel p-4 mb-4">
+            <div class="cyber-table-container">
+                <table class="cyber-table">
+                    <thead>
+                        <tr>
+                            <th>TX ID</th>
+                            <th>Book Title</th>
+                            <th>Member</th>
+                            <th>Issue Date</th>
+                            <th>Due Date</th>
+                            <th>Return Date</th>
+                            <th>Status</th>
+                            <th>Overdue Days</th>
+                            <th>Fine</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for tx in records %}
+                            <tr>
+                                <td class="text-secondary small fw-bold">#{{ tx.id }}</td>
+                                <td>
+                                    <div class="fw-bold text-white">{{ tx.book_title }}</div>
+                                    <span class="text-secondary small font-monospace">{{ tx.book_isbn }}</span>
+                                </td>
+                                <td>
+                                    <div class="fw-semibold text-white">{{ tx.member_name }}</div>
+                                    <span class="text-cyan small">{{ tx.member_email }}</span>
+                                </td>
+                                <td class="small">{{ tx.issue_date }}</td>
+                                <td class="small">{{ tx.due_date }}</td>
+                                <td class="small">{{ tx.return_date or '<span class="text-muted">Active Loan</span>'|safe }}</td>
+                                <td>
+                                    {% if tx.status == 'Returned' %}
+                                        <span class="badge-cyber badge-returned">Returned</span>
+                                    {% elif tx.status == 'Overdue' %}
+                                        <span class="badge-cyber badge-overdue">Overdue</span>
+                                    {% else %}
+                                        <span class="badge-cyber badge-issued">Issued</span>
+                                    {% endif %}
+                                </td>
+                                <td class="small">
+                                    {% if tx.overdue_days > 0 %}
+                                        <span class="text-warning fw-bold">{{ tx.overdue_days }} days</span>
+                                    {% else %}
+                                        <span class="text-muted">0</span>
+                                    {% endif %}
+                                </td>
+                                <td class="small">
+                                    {% if tx.fine_amount > 0 %}
+                                        <span class="text-warning fw-bold">${{ "%.2f"|format(tx.fine_amount) }}</span>
+                                    {% else %}
+                                        <span class="text-muted">$0.00</span>
+                                    {% endif %}
+                                </td>
+                            </tr>
+                        {% else %}
+                            <tr>
+                                <td colspan="9" class="text-center py-4 text-muted">No transactions found matching your criteria.</td>
+                            </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+    </section>
+
+</div>
+{% endblock %}

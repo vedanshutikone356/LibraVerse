@@ -1,0 +1,319 @@
+{% extends "base.html" %}
+
+{% block title %}Manage Book Inventory — LibraVerse Admin{% endblock %}
+
+{% block content %}
+<div class="admin-layout">
+    
+    <!-- Sidebar Navigation -->
+    <aside class="admin-sidebar">
+        <div class="mb-4 px-2">
+            <span class="badge-cyber badge-category mb-1" style="font-size: 0.65rem;">ADMINISTRATOR CONSOLE</span>
+            <h6 class="fw-bold text-white mb-0">{{ current_admin }}</h6>
+            <span class="text-secondary small">@{{ current_admin_username }}</span>
+        </div>
+
+        <ul class="admin-sidebar-menu">
+            <li class="admin-nav-item">
+                <a href="{{ url_for('dashboard') }}"><i class="bi bi-speedometer2 text-info"></i> Overview</a>
+            </li>
+            <li class="admin-nav-item active">
+                <a href="{{ url_for('manage_books') }}"><i class="bi bi-book text-primary"></i> Manage Books</a>
+            </li>
+            <li class="admin-nav-item">
+                <a href="{{ url_for('manage_members') }}"><i class="bi bi-people text-success"></i> Manage Members</a>
+            </li>
+            <li class="admin-nav-item">
+                <a href="{{ url_for('issue_return') }}"><i class="bi bi-arrow-left-right text-warning"></i> Issue & Return</a>
+            </li>
+            <li class="admin-nav-item">
+                <a href="{{ url_for('borrowing_history') }}"><i class="bi bi-clock-history text-light"></i> Borrowing History</a>
+            </li>
+            <li class="admin-nav-item">
+                <a href="{{ url_for('analytics') }}"><i class="bi bi-graph-up-arrow text-danger"></i> Deep Analytics</a>
+            </li>
+            <li class="my-3 border-top border-secondary border-opacity-25"></li>
+            <li class="admin-nav-item">
+                <a href="{{ url_for('export_data', export_type='books', fmt='csv') }}" class="text-info"><i class="bi bi-filetype-csv"></i> Export Books (CSV)</a>
+            </li>
+            <li class="admin-nav-item">
+                <a href="{{ url_for('export_data', export_type='books', fmt='excel') }}" class="text-emerald"><i class="bi bi-file-earmark-excel"></i> Export Books (Excel)</a>
+            </li>
+        </ul>
+    </aside>
+
+    <!-- Main Content -->
+    <section class="admin-content">
+        
+        <div class="d-flex flex-column flex-md-row justify-content-between align-items-md-center mb-4 gap-3">
+            <div>
+                <h1 class="h3 fw-bold text-white mb-1">Book Inventory Management</h1>
+                <p class="text-secondary small mb-0">Total volume database: {{ total }} book entries cataloged.</p>
+            </div>
+            
+            <button type="button" class="btn-cyber-primary" data-bs-toggle="modal" data-bs-target="#addBookModal">
+                <i class="bi bi-plus-lg"></i> Register New Book
+            </button>
+        </div>
+
+        <!-- Search & Filter Controls -->
+        <div class="glass-panel p-3 mb-4">
+            <form action="{{ url_for('manage_books') }}" method="GET" class="row g-2 align-items-center">
+                <div class="col-md-6">
+                    <div class="cyber-input-group">
+                        <i class="bi bi-search text-secondary ms-3 me-2"></i>
+                        <input type="text" name="search" class="cyber-input border-0 bg-transparent text-white" 
+                               placeholder="Search inventory by title, author, or ISBN..." value="{{ search }}">
+                        {% if search %}
+                            <a href="{{ url_for('manage_books', category=current_category) }}" class="text-secondary me-3"><i class="bi bi-x-circle-fill"></i></a>
+                        {% endif %}
+                    </div>
+                </div>
+                
+                <div class="col-md-4">
+                    <select name="category" class="cyber-input cyber-select small py-2" onchange="this.form.submit()">
+                        <option value="">All Categories</option>
+                        {% for cat in categories %}
+                            <option value="{{ cat }}" {% if current_category == cat %}selected{% endif %}>{{ cat }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+                
+                <div class="col-md-2 d-flex gap-2">
+                    <button type="submit" class="btn-cyber-primary btn-cyber-sm w-100 justify-content-center">Filter</button>
+                    {% if search or current_category %}
+                        <a href="{{ url_for('manage_books') }}" class="btn-cyber-outline btn-cyber-sm py-2 px-3" title="Clear Filters">
+                            <i class="bi bi-arrow-counterclockwise"></i>
+                        </a>
+                    {% endif %}
+                </div>
+            </form>
+        </div>
+
+        <!-- Books Table -->
+        <div class="glass-panel p-4 mb-4">
+            <div class="cyber-table-container">
+                <table class="cyber-table">
+                    <thead>
+                        <tr>
+                            <th>ID</th>
+                            <th>Cover</th>
+                            <th>Title & Author</th>
+                            <th>ISBN</th>
+                            <th>Category</th>
+                            <th>Copies (Avail / Total)</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for book in books %}
+                            <tr>
+                                <td class="text-secondary small fw-bold">#{{ book.id }}</td>
+                                <td style="width: 60px;">
+                                    <div class="position-relative rounded overflow-hidden shadow" style="width: 44px; height: 60px;">
+                                        {% if book.cover_url %}
+                                            <img src="{{ book.cover_url }}" alt="{{ book.title }}" class="w-100 h-100 object-fit-cover" onerror="window.handleImageError(this, '{{ book.title }}', '{{ book.author }}')">
+                                        {% endif %}
+                                        <div class="fallback-cover p-1 text-center justify-content-center" {% if book.cover_url %}style="display: none;"{% endif %}>
+                                            <i class="bi bi-book text-cyan"></i>
+                                        </div>
+                                    </div>
+                                </td>
+                                <td>
+                                    <div class="fw-bold text-white">{{ book.title }}</div>
+                                    <span class="text-secondary small">by {{ book.author }} ({{ book.publication_year }})</span>
+                                </td>
+                                <td class="small font-monospace text-info">{{ book.isbn }}</td>
+                                <td>
+                                    <span class="badge-cyber badge-category small">{{ book.category }}</span>
+                                </td>
+                                <td>
+                                    {% if book.available_copies > 0 %}
+                                        <span class="badge-cyber badge-available fw-bold">{{ book.available_copies }}</span>
+                                    {% else %}
+                                        <span class="badge-cyber badge-unavailable fw-bold">0</span>
+                                    {% endif %}
+                                    <span class="text-secondary small ms-1">/ {{ book.total_copies }}</span>
+                                </td>
+                                <td>
+                                    <div class="d-flex gap-2">
+                                        <!-- Edit Modal Trigger -->
+                                        <button type="button" class="btn-cyber-outline btn-cyber-sm py-1 px-2 text-info" 
+                                                data-bs-toggle="modal" data-bs-target="#editBookModal{{ book.id }}" title="Edit Book">
+                                            <i class="bi bi-pencil-square"></i>
+                                        </button>
+
+                                        <!-- Delete Form -->
+                                        <form action="{{ url_for('delete_book_route', book_id=book.id) }}" method="POST" 
+                                              onsubmit="return confirm('Are you sure you want to delete \'{{ book.title }}\'? This cannot be undone.');">
+                                            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                                            <button type="submit" class="btn-cyber-outline btn-cyber-sm py-1 px-2 text-rose" title="Delete Book">
+                                                <i class="bi bi-trash3"></i>
+                                            </button>
+                                        </form>
+                                    </div>
+
+                                    <!-- Edit Book Modal for this row -->
+                                    <div class="modal fade" id="editBookModal{{ book.id }}" tabindex="-1" aria-hidden="true">
+                                        <div class="modal-dialog modal-lg modal-dialog-centered">
+                                            <div class="modal-content glass-panel" style="background: var(--bg-surface); border: 1px solid var(--border-cyan);">
+                                                <form action="{{ url_for('edit_book_route', book_id=book.id) }}" method="POST">
+                                                    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                                                    
+                                                    <div class="modal-header border-secondary border-opacity-25">
+                                                        <h5 class="modal-title text-white fw-bold">
+                                                            <i class="bi bi-pencil-square text-cyan me-2"></i> Edit Book #{{ book.id }}
+                                                        </h5>
+                                                        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+                                                    </div>
+                                                    
+                                                    <div class="modal-body">
+                                                        <div class="row g-3">
+                                                            <div class="col-md-8">
+                                                                <label class="cyber-label">Book Title *</label>
+                                                                <input type="text" name="title" class="cyber-input" value="{{ book.title }}" required>
+                                                            </div>
+                                                            <div class="col-md-4">
+                                                                <label class="cyber-label">ISBN Identifier *</label>
+                                                                <input type="text" name="isbn" class="cyber-input" value="{{ book.isbn }}" required>
+                                                            </div>
+                                                            <div class="col-md-6">
+                                                                <label class="cyber-label">Author Name *</label>
+                                                                <input type="text" name="author" class="cyber-input" value="{{ book.author }}" required>
+                                                            </div>
+                                                            <div class="col-md-6">
+                                                                <label class="cyber-label">Category *</label>
+                                                                <input type="text" name="category" class="cyber-input" value="{{ book.category }}" list="categoryOptions" required>
+                                                            </div>
+                                                            <div class="col-md-6">
+                                                                <label class="cyber-label">Publisher *</label>
+                                                                <input type="text" name="publisher" class="cyber-input" value="{{ book.publisher }}" required>
+                                                            </div>
+                                                            <div class="col-md-3">
+                                                                <label class="cyber-label">Publication Year *</label>
+                                                                <input type="number" name="publication_year" class="cyber-input" value="{{ book.publication_year }}" required>
+                                                            </div>
+                                                            <div class="col-md-3">
+                                                                <label class="cyber-label">Total Inventory Copies *</label>
+                                                                <input type="number" name="total_copies" class="cyber-input" value="{{ book.total_copies }}" min="0" required>
+                                                            </div>
+                                                            <div class="col-12">
+                                                                <label class="cyber-label">Cover Image URL</label>
+                                                                <input type="url" name="cover_url" class="cyber-input" value="{{ book.cover_url or '' }}" placeholder="https://images.unsplash.com/...">
+                                                            </div>
+                                                            <div class="col-12">
+                                                                <label class="cyber-label">Description / Abstract</label>
+                                                                <textarea name="description" rows="3" class="cyber-input">{{ book.description or '' }}</textarea>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                    
+                                                    <div class="modal-footer border-secondary border-opacity-25">
+                                                        <button type="button" class="btn-cyber-outline btn-cyber-sm" data-bs-dismiss="modal">Cancel</button>
+                                                        <button type="submit" class="btn-cyber-primary btn-cyber-sm">Save Modifications</button>
+                                                    </div>
+                                                </form>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </td>
+                            </tr>
+                        {% else %}
+                            <tr>
+                                <td colspan="7" class="text-center py-4 text-muted">No books found matching the current query.</td>
+                            </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+
+            <!-- Pagination -->
+            {% if total_pages > 1 %}
+                <div class="d-flex justify-content-between align-items-center mt-3 pt-3 border-top border-secondary border-opacity-10">
+                    <span class="text-secondary small">Showing page {{ page }} of {{ total_pages }} ({{ total }} total)</span>
+                    <div class="d-flex gap-2">
+                        {% if page > 1 %}
+                            <a href="{{ url_for('manage_books', page=page-1, search=search, category=current_category) }}" class="btn-cyber-outline btn-cyber-sm">Previous</a>
+                        {% endif %}
+                        {% if page < total_pages %}
+                            <a href="{{ url_for('manage_books', page=page+1, search=search, category=current_category) }}" class="btn-cyber-outline btn-cyber-sm">Next</a>
+                        {% endif %}
+                    </div>
+                </div>
+            {% endif %}
+        </div>
+
+    </section>
+
+</div>
+
+<!-- Modal: Add New Book -->
+<div class="modal fade" id="addBookModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-lg modal-dialog-centered">
+        <div class="modal-content glass-panel" style="background: var(--bg-surface); border: 1px solid var(--border-cyan);">
+            <form action="{{ url_for('add_book_route') }}" method="POST">
+                <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                
+                <div class="modal-header border-secondary border-opacity-25">
+                    <h5 class="modal-title text-white fw-bold">
+                        <i class="bi bi-journal-plus text-cyan me-2"></i> Register New Book into Repository
+                    </h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                
+                <div class="modal-body">
+                    <div class="row g-3">
+                        <div class="col-md-8">
+                            <label class="cyber-label">Book Title *</label>
+                            <input type="text" name="title" class="cyber-input" placeholder="e.g. Designing Data-Intensive Applications" required>
+                        </div>
+                        <div class="col-md-4">
+                            <label class="cyber-label">ISBN Identifier *</label>
+                            <input type="text" name="isbn" class="cyber-input" placeholder="e.g. 978-1449373320" required>
+                        </div>
+                        <div class="col-md-6">
+                            <label class="cyber-label">Author Name *</label>
+                            <input type="text" name="author" class="cyber-input" placeholder="e.g. Martin Kleppmann" required>
+                        </div>
+                        <div class="col-md-6">
+                            <label class="cyber-label">Category *</label>
+                            <input type="text" name="category" class="cyber-input" list="categoryOptions" placeholder="Select or type..." required>
+                            <datalist id="categoryOptions">
+                                {% for cat in categories %}
+                                    <option value="{{ cat }}">
+                                {% endfor %}
+                            </datalist>
+                        </div>
+                        <div class="col-md-6">
+                            <label class="cyber-label">Publisher *</label>
+                            <input type="text" name="publisher" class="cyber-input" placeholder="e.g. O'Reilly Media" required>
+                        </div>
+                        <div class="col-md-3">
+                            <label class="cyber-label">Publication Year *</label>
+                            <input type="number" name="publication_year" class="cyber-input" value="{{ current_year }}" required>
+                        </div>
+                        <div class="col-md-3">
+                            <label class="cyber-label">Total Inventory Copies *</label>
+                            <input type="number" name="total_copies" class="cyber-input" value="5" min="1" required>
+                        </div>
+                        <div class="col-12">
+                            <label class="cyber-label">Cover Image URL (Optional)</label>
+                            <input type="url" name="cover_url" class="cyber-input" placeholder="https://images.unsplash.com/photo-...">
+                            <small class="text-muted">If omitted, an elegant geometric cyberpunk book cover will be generated automatically.</small>
+                        </div>
+                        <div class="col-12">
+                            <label class="cyber-label">Overview & Synopsis (Optional)</label>
+                            <textarea name="description" rows="3" class="cyber-input" placeholder="Concise overview of book themes, syllabus relevance, or synopsis..."></textarea>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="modal-footer border-secondary border-opacity-25">
+                    <button type="button" class="btn-cyber-outline btn-cyber-sm" data-bs-dismiss="modal">Cancel</button>
+                    <button type="submit" class="btn-cyber-primary btn-cyber-sm">Add Book</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock %}

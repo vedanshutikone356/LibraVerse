@@ -1,0 +1,346 @@
+{% extends "base.html" %}
+
+{% block title %}Command Console — LibraVerse Admin{% endblock %}
+
+{% block content %}
+<div class="admin-layout">
+    
+    <!-- Admin Sidebar Navigation -->
+    <aside class="admin-sidebar">
+        <div class="mb-4 px-2">
+            <span class="badge-cyber badge-category mb-1" style="font-size: 0.65rem;">ADMINISTRATOR CONSOLE</span>
+            <h6 class="fw-bold text-white mb-0">{{ current_admin }}</h6>
+            <span class="text-secondary small">@{{ current_admin_username }}</span>
+        </div>
+
+        <ul class="admin-sidebar-menu">
+            <li class="admin-nav-item active">
+                <a href="{{ url_for('dashboard') }}">
+                    <i class="bi bi-speedometer2 text-info"></i> Overview
+                </a>
+            </li>
+            <li class="admin-nav-item">
+                <a href="{{ url_for('manage_books') }}">
+                    <i class="bi bi-book text-primary"></i> Manage Books
+                </a>
+            </li>
+            <li class="admin-nav-item">
+                <a href="{{ url_for('manage_members') }}">
+                    <i class="bi bi-people text-success"></i> Manage Members
+                </a>
+            </li>
+            <li class="admin-nav-item">
+                <a href="{{ url_for('issue_return') }}">
+                    <i class="bi bi-arrow-left-right text-warning"></i> Issue & Return
+                </a>
+            </li>
+            <li class="admin-nav-item">
+                <a href="{{ url_for('borrowing_history') }}">
+                    <i class="bi bi-clock-history text-light"></i> Borrowing History
+                </a>
+            </li>
+            <li class="admin-nav-item">
+                <a href="{{ url_for('analytics') }}">
+                    <i class="bi bi-graph-up-arrow text-danger"></i> Deep Analytics
+                </a>
+            </li>
+            
+            <li class="my-3 border-top border-secondary border-opacity-25"></li>
+            
+            <!-- Quick Export Dropdown / Buttons -->
+            <li class="admin-nav-item">
+                <a href="{{ url_for('export_data', export_type='comprehensive', fmt='excel') }}" class="text-emerald">
+                    <i class="bi bi-file-earmark-excel-fill text-emerald"></i> Export Master Excel
+                </a>
+            </li>
+            <li class="admin-nav-item">
+                <a href="{{ url_for('logout') }}" class="text-rose">
+                    <i class="bi bi-box-arrow-right text-rose"></i> Sign Out
+                </a>
+            </li>
+        </ul>
+    </aside>
+
+    <!-- Admin Main Body -->
+    <section class="admin-content">
+        
+        <!-- Welcome Header -->
+        <div class="d-flex flex-column flex-md-row justify-content-between align-items-md-center mb-4 gap-3">
+            <div>
+                <h1 class="h3 fw-bold text-white mb-1">Command Overview</h1>
+                <p class="text-secondary small mb-0">Real-time repository statistics & machine-assisted circulation metrics.</p>
+            </div>
+            
+            <!-- Action Shortcuts -->
+            <div class="d-flex flex-wrap gap-2">
+                <a href="{{ url_for('issue_return') }}" class="btn-cyber-primary btn-cyber-sm">
+                    <i class="bi bi-plus-circle me-1"></i> Issue Book
+                </a>
+                <a href="{{ url_for('manage_books') }}" class="btn-cyber-outline btn-cyber-sm">
+                    <i class="bi bi-journal-plus me-1"></i> Add Title
+                </a>
+                <div class="dropdown">
+                    <button class="btn-cyber-cyan btn-cyber-sm dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false">
+                        <i class="bi bi-download me-1"></i> Export Data
+                    </button>
+                    <ul class="dropdown-menu dropdown-menu-dark glass-panel">
+                        <li><a class="dropdown-item small" href="{{ url_for('export_data', export_type='books', fmt='csv') }}"><i class="bi bi-filetype-csv me-2"></i> Books (CSV)</a></li>
+                        <li><a class="dropdown-item small" href="{{ url_for('export_data', export_type='books', fmt='excel') }}"><i class="bi bi-file-earmark-excel me-2"></i> Books (Excel)</a></li>
+                        <li><a class="dropdown-item small" href="{{ url_for('export_data', export_type='members', fmt='csv') }}"><i class="bi bi-filetype-csv me-2"></i> Members (CSV)</a></li>
+                        <li><a class="dropdown-item small" href="{{ url_for('export_data', export_type='borrowings', fmt='csv') }}"><i class="bi bi-filetype-csv me-2"></i> Transactions (CSV)</a></li>
+                        <li><hr class="dropdown-divider border-secondary border-opacity-25"></li>
+                        <li><a class="dropdown-item small text-info fw-bold" href="{{ url_for('export_data', export_type='comprehensive', fmt='excel') }}"><i class="bi bi-stars me-2"></i> Comprehensive Excel Workbook</a></li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+        <!-- 7 Core Database Metric Cards -->
+        <div class="row g-3 mb-4">
+            
+            <!-- 1. Total Unique Titles -->
+            <div class="col-xl-3 col-sm-6">
+                <div class="glass-panel p-3 h-100 glass-panel-hover">
+                    <div class="d-flex justify-content-between align-items-center mb-2">
+                        <span class="text-secondary small fw-semibold">TOTAL TITLES</span>
+                        <i class="bi bi-journal-text text-primary fs-5"></i>
+                    </div>
+                    <h3 class="fw-bold mb-0 text-white" data-counter="{{ metrics.total_titles }}">0</h3>
+                    <span class="text-muted small">Unique catalog entries</span>
+                </div>
+            </div>
+
+            <!-- 2. Total Physical Copies -->
+            <div class="col-xl-3 col-sm-6">
+                <div class="glass-panel p-3 h-100 glass-panel-hover">
+                    <div class="d-flex justify-content-between align-items-center mb-2">
+                        <span class="text-secondary small fw-semibold">PHYSICAL COPIES</span>
+                        <i class="bi bi-stack text-info fs-5"></i>
+                    </div>
+                    <h3 class="fw-bold mb-0 text-white" data-counter="{{ metrics.total_copies }}">0</h3>
+                    <span class="text-muted small">Total inventory stock</span>
+                </div>
+            </div>
+
+            <!-- 3. Available Copies -->
+            <div class="col-xl-3 col-sm-6">
+                <div class="glass-panel p-3 h-100 glass-panel-hover">
+                    <div class="d-flex justify-content-between align-items-center mb-2">
+                        <span class="text-secondary small fw-semibold">AVAILABLE COPIES</span>
+                        <i class="bi bi-check-circle text-emerald fs-5"></i>
+                    </div>
+                    <h3 class="fw-bold mb-0 text-emerald" data-counter="{{ metrics.available_copies }}">0</h3>
+                    <span class="text-muted small">Ready on shelves</span>
+                </div>
+            </div>
+
+            <!-- 4. Currently Issued -->
+            <div class="col-xl-3 col-sm-6">
+                <div class="glass-panel p-3 h-100 glass-panel-hover">
+                    <div class="d-flex justify-content-between align-items-center mb-2">
+                        <span class="text-secondary small fw-semibold">CURRENTLY ISSUED</span>
+                        <i class="bi bi-arrow-repeat text-warning fs-5"></i>
+                    </div>
+                    <h3 class="fw-bold mb-0 text-warning" data-counter="{{ metrics.issued_copies }}">0</h3>
+                    <span class="text-muted small">Circulation rate: {{ metrics.circulation_rate }}%</span>
+                </div>
+            </div>
+
+            <!-- 5. Registered Members -->
+            <div class="col-xl-4 col-sm-6">
+                <div class="glass-panel p-3 h-100 glass-panel-hover">
+                    <div class="d-flex justify-content-between align-items-center mb-2">
+                        <span class="text-secondary small fw-semibold">REGISTERED MEMBERS</span>
+                        <i class="bi bi-people text-info fs-5"></i>
+                    </div>
+                    <h3 class="fw-bold mb-0 text-white" data-counter="{{ metrics.total_members }}">0</h3>
+                    <span class="text-muted small">{{ metrics.active_members }} active accounts</span>
+                </div>
+            </div>
+
+            <!-- 6. Overdue Books -->
+            <div class="col-xl-4 col-sm-6">
+                <div class="glass-panel p-3 h-100 glass-panel-hover">
+                    <div class="d-flex justify-content-between align-items-center mb-2">
+                        <span class="text-secondary small fw-semibold">OVERDUE BOOKS</span>
+                        <i class="bi bi-exclamation-triangle text-rose fs-5"></i>
+                    </div>
+                    <h3 class="fw-bold mb-0 {% if metrics.overdue_count > 0 %}text-danger{% else %}text-emerald{% endif %}" data-counter="{{ metrics.overdue_count }}">0</h3>
+                    <span class="text-muted small">Accrued fines: ${{ metrics.total_fines }}</span>
+                </div>
+            </div>
+
+            <!-- 7. Total Transactions -->
+            <div class="col-xl-4 col-sm-12">
+                <div class="glass-panel p-3 h-100 glass-panel-hover">
+                    <div class="d-flex justify-content-between align-items-center mb-2">
+                        <span class="text-secondary small fw-semibold">TOTAL TRANSACTIONS</span>
+                        <i class="bi bi-receipt text-primary fs-5"></i>
+                    </div>
+                    <h3 class="fw-bold mb-0 text-white" data-counter="{{ metrics.total_transactions }}">0</h3>
+                    <span class="text-muted small">Lifetime checkout events</span>
+                </div>
+            </div>
+
+        </div>
+
+        <!-- Visual Analytics Row (Chart.js) -->
+        <div class="row g-4 mb-4">
+            
+            <!-- Chart 1: Books by Category (Doughnut) -->
+            <div class="col-lg-5">
+                <div class="glass-panel p-4 h-100">
+                    <div class="d-flex justify-content-between align-items-center mb-3">
+                        <h6 class="fw-bold text-white mb-0">
+                            <i class="bi bi-pie-chart-fill text-info me-2"></i> Inventory by Category
+                        </h6>
+                        <span class="badge-cyber badge-category small">Pandas GroupBy</span>
+                    </div>
+                    <div style="height: 280px; position: relative;">
+                        <canvas id="categoryDistributionChart"></canvas>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Chart 2: Available vs Issued Copies (Bar) -->
+            <div class="col-lg-7">
+                <div class="glass-panel p-4 h-100">
+                    <div class="d-flex justify-content-between align-items-center mb-3">
+                        <h6 class="fw-bold text-white mb-0">
+                            <i class="bi bi-bar-chart-fill text-cyan me-2"></i> Available vs Issued Copies
+                        </h6>
+                        <span class="badge-cyber badge-category small">Stock Balance</span>
+                    </div>
+                    <div style="height: 280px; position: relative;">
+                        <canvas id="copiesComparisonChart"></canvas>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Chart 3: Most Frequently Borrowed Books (Horizontal Bar) -->
+            <div class="col-lg-6">
+                <div class="glass-panel p-4 h-100">
+                    <div class="d-flex justify-content-between align-items-center mb-3">
+                        <h6 class="fw-bold text-white mb-0">
+                            <i class="bi bi-trophy-fill text-warning me-2"></i> Top Borrowed Volumes
+                        </h6>
+                        <span class="badge-cyber badge-category small">Popularity Ranking</span>
+                    </div>
+                    <div style="height: 260px; position: relative;">
+                        <canvas id="popularBooksChart"></canvas>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Chart 4: Monthly Borrowing Trends (Area Line) -->
+            <div class="col-lg-6">
+                <div class="glass-panel p-4 h-100">
+                    <div class="d-flex justify-content-between align-items-center mb-3">
+                        <h6 class="fw-bold text-white mb-0">
+                            <i class="bi bi-activity text-info me-2"></i> Monthly Circulation Velocity
+                        </h6>
+                        <span class="badge-cyber badge-category small">NumPy Mean: {{ monthly_trends.mean_monthly }}</span>
+                    </div>
+                    <div style="height: 260px; position: relative;">
+                        <canvas id="monthlyTrendsChart"></canvas>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+
+        <!-- Recent Transactions Table -->
+        <div class="glass-panel p-4 mb-4">
+            <div class="d-flex justify-content-between align-items-center mb-3">
+                <h6 class="fw-bold text-white mb-0">
+                    <i class="bi bi-clock-history text-secondary me-2"></i> Recent Circulation Activity
+                </h6>
+                <a href="{{ url_for('borrowing_history') }}" class="btn-cyber-outline btn-cyber-sm">
+                    View Complete Log ({{ metrics.total_transactions }}) <i class="bi bi-arrow-right"></i>
+                </a>
+            </div>
+
+            <div class="cyber-table-container">
+                <table class="cyber-table">
+                    <thead>
+                        <tr>
+                            <th>TX ID</th>
+                            <th>Book Title</th>
+                            <th>Member</th>
+                            <th>Issue Date</th>
+                            <th>Due Date</th>
+                            <th>Status</th>
+                            <th>Action</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for tx in recent_borrowings %}
+                            <tr>
+                                <td class="text-secondary small fw-bold">#{{ tx.id }}</td>
+                                <td class="fw-semibold text-white">{{ tx.book_title }}</td>
+                                <td class="text-secondary">{{ tx.member_name }}</td>
+                                <td class="small">{{ tx.issue_date }}</td>
+                                <td class="small">{{ tx.due_date }}</td>
+                                <td>
+                                    {% if tx.status == 'Returned' %}
+                                        <span class="badge-cyber badge-returned">Returned</span>
+                                    {% elif tx.status == 'Overdue' %}
+                                        <span class="badge-cyber badge-overdue">Overdue ({{ tx.overdue_days }}d)</span>
+                                    {% else %}
+                                        <span class="badge-cyber badge-issued">Issued</span>
+                                    {% endif %}
+                                </td>
+                                <td>
+                                    {% if tx.status != 'Returned' %}
+                                        <form action="{{ url_for('return_book_route', borrowing_id=tx.id) }}" method="POST" class="d-inline">
+                                            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                                            <button type="submit" class="btn-cyber-outline btn-cyber-sm py-1 px-2 text-emerald" title="Quick Return Book">
+                                                <i class="bi bi-check-lg"></i> Return
+                                            </button>
+                                        </form>
+                                    {% else %}
+                                        <span class="text-muted small">Completed</span>
+                                    {% endif %}
+                                </td>
+                            </tr>
+                        {% else %}
+                            <tr>
+                                <td colspan="7" class="text-center py-4 text-muted">No circulation transactions recorded yet.</td>
+                            </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+    </section>
+
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script src="{{ url_for('static', filename='js/dashboard.js') }}"></script>
+<script>
+    // Inject dynamic data for Chart.js from Flask Pandas/NumPy backend
+    window.categoryChartData = {
+        labels: {{ category_data.labels | tojson }},
+        counts: {{ category_data.title_counts | tojson }}
+    };
+
+    window.copiesChartData = {
+        labels: {{ category_data.labels | tojson }},
+        available: {{ category_data.available_copies | tojson }},
+        issued: {{ category_data.issued_copies | tojson }}
+    };
+
+    window.popularBooksChartData = {
+        labels: {{ top_books.labels | tojson }},
+        counts: {{ top_books.counts | tojson }}
+    };
+
+    window.monthlyTrendsChartData = {
+        labels: {{ monthly_trends.labels | tojson }},
+        counts: {{ monthly_trends.counts | tojson }}
+    };
+</script>
+{% endblock %}

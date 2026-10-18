@@ -1,0 +1,40 @@
+{% extends "base.html" %}
+
+{% block title %}Anomaly Detected ({{ code }}) — LibraVerse{% endblock %}
+
+{% block content %}
+<div class="container py-5 my-auto text-center" style="min-height: 70vh; display: flex; align-items: center; justify-content: center;">
+    
+    <div class="col-lg-6 col-md-8">
+        
+        <div class="glass-panel p-5 position-relative overflow-hidden reveal" style="border: 1px solid var(--border-cyan);">
+            <div class="cyber-glow-purple" style="top: -100px; left: -50px;"></div>
+            
+            <div class="position-relative z-2">
+                <div class="d-inline-flex p-4 rounded-circle mb-3" style="background: rgba(244, 63, 94, 0.12); color: var(--accent-rose);">
+                    <i class="bi bi-shield-slash fs-1"></i>
+                </div>
+                
+                <h1 class="display-3 fw-bolder text-white mb-2">{{ code }}</h1>
+                <h3 class="fw-bold text-cyan mb-3">{{ title }}</h3>
+                
+                <p class="text-secondary mx-auto mb-4" style="max-width: 440px;">
+                    {{ message }}
+                </p>
+
+                <div class="d-flex flex-wrap justify-content-center gap-3">
+                    <a href="{{ url_for('index') }}" class="btn-cyber-primary">
+                        <i class="bi bi-house-door"></i> Return to Safety (Home)
+                    </a>
+                    <a href="{{ url_for('books_catalog') }}" class="btn-cyber-outline">
+                        <i class="bi bi-compass"></i> Explore Catalog
+                    </a>
+                </div>
+            </div>
+            
+        </div>
+
+    </div>
+
+</div>
+{% endblock %}

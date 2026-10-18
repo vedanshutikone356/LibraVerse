@@ -1,0 +1,336 @@
+{% extends "base.html" %}
+
+{% block title %}LibraVerse — Enter a Universe of Knowledge{% endblock %}
+
+{% block content %}
+<!-- Atmospheric Ambient Orbs -->
+<div class="cyber-glow-purple" style="top: 50px; left: -100px;"></div>
+<div class="cyber-glow-cyan" style="top: 250px; right: -100px;"></div>
+
+<!-- ==========================================================================
+     HERO SECTION (3D Floating Books, Space Parallax, Search & CTA)
+     ========================================================================== -->
+<section class="position-relative overflow-hidden py-5 py-lg-6" id="heroUniverse" style="min-height: 85vh; display: flex; align-items: center;">
+    
+    <!-- Floating 3D Book 1 (Left Wing) -->
+    <div class="hero-book-float-1 d-none d-lg-block hero-parallax-layer" data-parallax-depth="0.18">
+        <div class="book-3d-scene">
+            <div class="book-3d-object">
+                <div class="book-face-front">
+                    <img src="https://images.unsplash.com/photo-1517694712202-14dd9538aa97?auto=format&fit=crop&w=600&q=80" alt="Clean Code" onerror="window.handleImageError(this, 'Clean Code', 'Robert C. Martin')">
+                    <div class="fallback-cover" style="display: none;">
+                        <div class="fallback-cover-cat">PROGRAMMING</div>
+                        <div class="fallback-cover-title">Clean Code</div>
+                        <div class="fallback-cover-author">Robert C. Martin</div>
+                    </div>
+                    <div class="book-front-glare"></div>
+                </div>
+                <div class="book-face-spine">
+                    <span class="book-spine-text">CLEAN CODE</span>
+                </div>
+                <div class="book-face-pages"></div>
+                <div class="book-face-back"></div>
+            </div>
+            <div class="book-3d-shadow"></div>
+        </div>
+    </div>
+
+    <!-- Floating 3D Book 2 (Right Wing) -->
+    <div class="hero-book-float-2 d-none d-lg-block hero-parallax-layer" data-parallax-depth="0.25">
+        <div class="book-3d-scene">
+            <div class="book-3d-object">
+                <div class="book-face-front">
+                    <img src="https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?auto=format&fit=crop&w=600&q=80" alt="Life 3.0" onerror="window.handleImageError(this, 'Life 3.0', 'Max Tegmark')">
+                    <div class="fallback-cover" style="display: none;">
+                        <div class="fallback-cover-cat">TECHNOLOGY</div>
+                        <div class="fallback-cover-title">Life 3.0: AI Future</div>
+                        <div class="fallback-cover-author">Max Tegmark</div>
+                    </div>
+                    <div class="book-front-glare"></div>
+                </div>
+                <div class="book-face-spine">
+                    <span class="book-spine-text">LIFE 3.0 • AI</span>
+                </div>
+                <div class="book-face-pages"></div>
+                <div class="book-face-back"></div>
+            </div>
+            <div class="book-3d-shadow"></div>
+        </div>
+    </div>
+
+    <!-- Floating 3D Book 3 (Deep Cosmic Layer) -->
+    <div class="hero-book-float-3 d-none d-lg-block hero-parallax-layer" data-parallax-depth="0.10">
+        <div class="book-3d-scene">
+            <div class="book-3d-object">
+                <div class="book-face-front">
+                    <img src="https://images.unsplash.com/photo-1446776811953-b23d57bd21aa?auto=format&fit=crop&w=600&q=80" alt="Cosmos" onerror="window.handleImageError(this, 'Cosmos', 'Carl Sagan')">
+                    <div class="fallback-cover" style="display: none;">
+                        <div class="fallback-cover-cat">SCIENCE</div>
+                        <div class="fallback-cover-title">Cosmos</div>
+                        <div class="fallback-cover-author">Carl Sagan</div>
+                    </div>
+                    <div class="book-front-glare"></div>
+                </div>
+                <div class="book-face-spine">
+                    <span class="book-spine-text">COSMOS • SAGAN</span>
+                </div>
+                <div class="book-face-pages"></div>
+                <div class="book-face-back"></div>
+            </div>
+            <div class="book-3d-shadow"></div>
+        </div>
+    </div>
+
+    <div class="container position-relative z-3">
+        <div class="row justify-content-center text-center">
+            <div class="col-xl-9 col-lg-10">
+                
+                <!-- Status Badge -->
+                <div class="d-inline-flex align-items-center gap-2 px-3 py-1 rounded-pill glass-panel mb-4 reveal">
+                    <span class="spinner-grow spinner-grow-sm text-info" role="status" aria-hidden="true"></span>
+                    <span class="small fw-semibold text-secondary">NEXT-GEN DIGITAL REPOSITORY ACTIVE</span>
+                </div>
+
+                <!-- Cinematic Heading -->
+                <h1 class="display-3 fw-bolder mb-3 text-uppercase text-white tracking-tight reveal reveal-delay-100">
+                    Enter a Universe <br>
+                    <span class="brand-text-accent">of Knowledge</span>
+                </h1>
+
+                <!-- Supporting Text -->
+                <p class="lead text-secondary mb-5 mx-auto reveal reveal-delay-200" style="max-width: 680px; font-weight: 400;">
+                    Discover timeless stories, explore groundbreaking ideas, and unlock a universe of knowledge through your personal digital library.
+                </p>
+
+                <!-- Search Bar -->
+                <div class="row justify-content-center mb-4 reveal reveal-delay-300">
+                    <div class="col-lg-8 col-md-10">
+                        <form action="{{ url_for('books_catalog') }}" method="GET" class="glass-panel p-2 p-md-3 d-flex flex-column flex-sm-row gap-2 shadow-lg" style="border: 1px solid var(--border-cyan);">
+                            <div class="cyber-input-group flex-grow-1">
+                                <i class="bi bi-search text-info fs-5 ms-3 me-2"></i>
+                                <input type="text" name="search" class="cyber-input border-0 bg-transparent text-white" placeholder="Search by title, author, category, or ISBN..." required>
+                            </div>
+                            <button type="submit" class="btn-cyber-primary px-4 py-2">
+                                <span>Search</span> <i class="bi bi-arrow-right"></i>
+                            </button>
+                        </form>
+                    </div>
+                </div>
+
+                <!-- Action CTA Buttons -->
+                <div class="d-flex flex-wrap justify-content-center gap-3 reveal reveal-delay-400">
+                    <a href="{{ url_for('books_catalog') }}" class="btn-cyber-cyan">
+                        <i class="bi bi-compass"></i> Explore Library
+                    </a>
+                    <a href="#featuredSection" class="btn-cyber-outline">
+                        <i class="bi bi-stars"></i> Discover Featured Books
+                    </a>
+                </div>
+
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- ==========================================================================
+     LIBRARY STATISTICS (Real Database Records with Animated Counters)
+     ========================================================================== -->
+<section class="py-5 position-relative">
+    <div class="container">
+        <div class="row g-4">
+            
+            <!-- Stat 1: Total Book Titles -->
+            <div class="col-lg-3 col-sm-6 reveal reveal-delay-100">
+                <div class="glass-panel p-4 h-100 text-center glass-panel-hover">
+                    <div class="d-inline-flex p-3 rounded-circle mb-3" style="background: rgba(139, 92, 246, 0.15); color: var(--primary-purple);">
+                        <i class="bi bi-journal-bookmark-fill fs-2"></i>
+                    </div>
+                    <h2 class="display-5 fw-bold mb-1" data-counter="{{ metrics.total_titles }}">0</h2>
+                    <p class="text-secondary small text-uppercase mb-0 fw-semibold tracking-wide">Unique Book Titles</p>
+                </div>
+            </div>
+
+            <!-- Stat 2: Total Available Copies -->
+            <div class="col-lg-3 col-sm-6 reveal reveal-delay-200">
+                <div class="glass-panel p-4 h-100 text-center glass-panel-hover">
+                    <div class="d-inline-flex p-3 rounded-circle mb-3" style="background: rgba(16, 185, 129, 0.15); color: #34D399;">
+                        <i class="bi bi-check2-circle fs-2"></i>
+                    </div>
+                    <h2 class="display-5 fw-bold mb-1 text-emerald" data-counter="{{ metrics.available_copies }}">0</h2>
+                    <p class="text-secondary small text-uppercase mb-0 fw-semibold tracking-wide">Available Copies</p>
+                </div>
+            </div>
+
+            <!-- Stat 3: Registered Members -->
+            <div class="col-lg-3 col-sm-6 reveal reveal-delay-300">
+                <div class="glass-panel p-4 h-100 text-center glass-panel-hover">
+                    <div class="d-inline-flex p-3 rounded-circle mb-3" style="background: rgba(34, 211, 238, 0.15); color: var(--accent-cyan);">
+                        <i class="bi bi-people-fill fs-2"></i>
+                    </div>
+                    <h2 class="display-5 fw-bold mb-1 text-info" data-counter="{{ metrics.total_members }}">0</h2>
+                    <p class="text-secondary small text-uppercase mb-0 fw-semibold tracking-wide">Active Members</p>
+                </div>
+            </div>
+
+            <!-- Stat 4: Books Currently Issued -->
+            <div class="col-lg-3 col-sm-6 reveal reveal-delay-400">
+                <div class="glass-panel p-4 h-100 text-center glass-panel-hover">
+                    <div class="d-inline-flex p-3 rounded-circle mb-3" style="background: rgba(245, 158, 11, 0.15); color: var(--accent-amber);">
+                        <i class="bi bi-arrow-repeat fs-2"></i>
+                    </div>
+                    <h2 class="display-5 fw-bold mb-1 text-warning" data-counter="{{ metrics.issued_copies }}">0</h2>
+                    <p class="text-secondary small text-uppercase mb-0 fw-semibold tracking-wide">Copies in Circulation</p>
+                </div>
+            </div>
+
+        </div>
+    </div>
+</section>
+
+<!-- ==========================================================================
+     FEATURED BOOKS (Interactive 3D Tilt Cards)
+     ========================================================================== -->
+<section class="py-5" id="featuredSection">
+    <div class="container">
+        
+        <div class="d-flex flex-column flex-md-row justify-content-between align-items-md-end mb-4 reveal">
+            <div>
+                <span class="badge-cyber badge-category mb-2">CURATED HIGHLIGHTS</span>
+                <h2 class="display-6 fw-bold mb-0">Featured Books</h2>
+            </div>
+            <a href="{{ url_for('books_catalog') }}" class="btn-cyber-outline btn-cyber-sm mt-3 mt-md-0">
+                View Full Catalog ({{ metrics.total_titles }}) <i class="bi bi-arrow-right"></i>
+            </a>
+        </div>
+
+        <div class="row g-4">
+            {% for book in featured_books %}
+                <div class="col-xl-4 col-md-6 reveal reveal-delay-{{ loop.index * 100 }}">
+                    <div class="card-3d-wrapper">
+                        <div class="card-3d card-3d-interactive p-3">
+                            <div class="card-3d-glare"></div>
+                            
+                            <div class="row g-3 h-100">
+                                <!-- Book Cover Thumbnail with 3D Spine Crease -->
+                                <div class="col-5">
+                                    <div class="position-relative h-100 rounded overflow-hidden shadow" style="min-height: 180px;">
+                                        {% if book.cover_url %}
+                                            <img src="{{ book.cover_url }}" alt="{{ book.title }}" class="w-100 h-100 object-fit-cover" onerror="window.handleImageError(this, '{{ book.title }}', '{{ book.author }}')">
+                                        {% endif %}
+                                        <div class="fallback-cover" {% if book.cover_url %}style="display: none;"{% endif %}>
+                                            <div class="fallback-cover-cat">{{ book.category }}</div>
+                                            <div class="fallback-cover-title">{{ book.title }}</div>
+                                            <div class="fallback-cover-author">{{ book.author }}</div>
+                                        </div>
+                                    </div>
+                                </div>
+                                
+                                <!-- Book Metadata -->
+                                <div class="col-7 d-flex flex-column justify-content-between">
+                                    <div class="card-layer-z1">
+                                        <div class="d-flex justify-content-between align-items-start mb-1">
+                                            <span class="badge-cyber badge-category small py-1 px-2" style="font-size: 0.7rem;">{{ book.category }}</span>
+                                            {% if book.available_copies > 0 %}
+                                                <span class="badge-cyber badge-available small py-1 px-2" style="font-size: 0.7rem;">{{ book.available_copies }} left</span>
+                                            {% else %}
+                                                <span class="badge-cyber badge-unavailable small py-1 px-2" style="font-size: 0.7rem;">Loaned</span>
+                                            {% endif %}
+                                        </div>
+                                        
+                                        <h5 class="fw-bold fs-6 mb-1 text-truncate-2 text-white">{{ book.title }}</h5>
+                                        <p class="text-secondary small mb-2">by {{ book.author }}</p>
+                                        <p class="text-muted small mb-0">{{ book.publication_year }} • {{ book.publisher }}</p>
+                                    </div>
+                                    
+                                    <div class="card-layer-z2 pt-3 border-top border-secondary border-opacity-10 d-flex gap-2">
+                                        <button type="button" class="btn-cyber-primary btn-cyber-sm w-100 justify-content-center" data-open-modal data-book-id="{{ book.id }}">
+                                            <i class="bi bi-eye"></i> Details
+                                        </button>
+                                        <a href="{{ url_for('book_details', book_id=book.id) }}" class="btn-cyber-outline btn-cyber-sm px-2" title="Dedicated Page">
+                                            <i class="bi bi-arrow-up-right"></i>
+                                        </a>
+                                    </div>
+                                </div>
+                            </div>
+
+                        </div>
+                    </div>
+                </div>
+            {% endfor %}
+        </div>
+
+    </div>
+</section>
+
+<!-- ==========================================================================
+     CATEGORIES GRID (Filter by Category)
+     ========================================================================== -->
+<section class="py-5 position-relative">
+    <div class="container">
+        
+        <div class="text-center mb-5 reveal">
+            <span class="badge-cyber badge-category mb-2">TAXONOMY</span>
+            <h2 class="display-6 fw-bold">Explore by Category</h2>
+            <p class="text-secondary mx-auto" style="max-width: 550px;">
+                Dive into specialized disciplines across sciences, modern computation, and profound world literature.
+            </p>
+        </div>
+
+        <div class="row g-3 justify-content-center">
+            {% set category_icons = {
+                'Programming': 'bi-code-slash',
+                'Technology': 'bi-cpu',
+                'Science': 'bi-radioactive',
+                'Fiction': 'bi-book',
+                'Mystery': 'bi-incognito',
+                'History': 'bi-hourglass-split',
+                'Business': 'bi-graph-up-arrow',
+                'Personal Development': 'bi-lightning-charge'
+            } %}
+
+            {% for cat in categories %}
+                <div class="col-lg-3 col-md-4 col-sm-6 reveal reveal-delay-{{ loop.index * 50 }}">
+                    <a href="{{ url_for('books_catalog', category=cat) }}" class="text-decoration-none d-block h-100">
+                        <div class="glass-panel p-4 h-100 d-flex align-items-center gap-3 glass-panel-hover">
+                            <div class="p-3 rounded-3" style="background: rgba(34, 211, 238, 0.12); color: var(--accent-cyan);">
+                                <i class="bi {{ category_icons.get(cat, 'bi-journal') }} fs-3"></i>
+                            </div>
+                            <div>
+                                <h6 class="fw-bold mb-1 text-white">{{ cat }}</h6>
+                                <span class="text-secondary small">Explore titles <i class="bi bi-chevron-right ms-1"></i></span>
+                            </div>
+                        </div>
+                    </a>
+                </div>
+            {% endfor %}
+        </div>
+
+    </div>
+</section>
+
+<!-- ==========================================================================
+     CALL TO ACTION / MISSION BANNER
+     ========================================================================== -->
+<section class="py-5 mb-5">
+    <div class="container">
+        <div class="glass-panel p-5 text-center position-relative overflow-hidden reveal" style="border: 1px solid var(--border-cyan);">
+            <div class="cyber-glow-cyan" style="top: -100px; left: 30%;"></div>
+            
+            <div class="position-relative z-2">
+                <h3 class="display-6 fw-bold mb-3">Empowering Readers with Modern Cybernetics</h3>
+                <p class="text-secondary mb-4 mx-auto" style="max-width: 600px;">
+                    LibraVerse seamlessly merges physical library inventory control with high-performance Python analytics and immersive spatial interfaces.
+                </p>
+                <div class="d-flex flex-wrap justify-content-center gap-3">
+                    <a href="{{ url_for('books_catalog') }}" class="btn-cyber-primary">
+                        <i class="bi bi-book"></i> Start Browsing
+                    </a>
+                    <a href="{{ url_for('login') }}" class="btn-cyber-outline">
+                        <i class="bi bi-shield-lock"></i> Administrator Console
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+{% endblock %}

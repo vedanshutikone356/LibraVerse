@@ -1,0 +1,139 @@
+{% extends "base.html" %}
+
+{% block title %}Borrowing History for {{ member.full_name }} — LibraVerse{% endblock %}
+
+{% block content %}
+<div class="admin-layout">
+    
+    <!-- Sidebar -->
+    <aside class="admin-sidebar">
+        <div class="mb-4 px-2">
+            <span class="badge-cyber badge-category mb-1" style="font-size: 0.65rem;">ADMINISTRATOR CONSOLE</span>
+            <h6 class="fw-bold text-white mb-0">{{ current_admin }}</h6>
+            <span class="text-secondary small">@{{ current_admin_username }}</span>
+        </div>
+
+        <ul class="admin-sidebar-menu">
+            <li class="admin-nav-item">
+                <a href="{{ url_for('dashboard') }}"><i class="bi bi-speedometer2 text-info"></i> Overview</a>
+            </li>
+            <li class="admin-nav-item">
+                <a href="{{ url_for('manage_books') }}"><i class="bi bi-book text-primary"></i> Manage Books</a>
+            </li>
+            <li class="admin-nav-item active">
+                <a href="{{ url_for('manage_members') }}"><i class="bi bi-people text-success"></i> Manage Members</a>
+            </li>
+            <li class="admin-nav-item">
+                <a href="{{ url_for('issue_return') }}"><i class="bi bi-arrow-left-right text-warning"></i> Issue & Return</a>
+            </li>
+            <li class="admin-nav-item">
+                <a href="{{ url_for('borrowing_history') }}"><i class="bi bi-clock-history text-light"></i> Borrowing History</a>
+            </li>
+            <li class="admin-nav-item">
+                <a href="{{ url_for('analytics') }}"><i class="bi bi-graph-up-arrow text-danger"></i> Deep Analytics</a>
+            </li>
+        </ul>
+    </aside>
+
+    <!-- Main Content -->
+    <section class="admin-content">
+        
+        <div class="d-flex align-items-center justify-content-between mb-4">
+            <div>
+                <a href="{{ url_for('manage_members') }}" class="btn-cyber-outline btn-cyber-sm mb-2">
+                    <i class="bi bi-arrow-left"></i> Back to Members
+                </a>
+                <h1 class="h3 fw-bold text-white mb-0">Borrowing Profile: {{ member.full_name }}</h1>
+            </div>
+            
+            <a href="{{ url_for('issue_return') }}" class="btn-cyber-primary btn-cyber-sm">
+                <i class="bi bi-plus-circle me-1"></i> Issue Book to Member
+            </a>
+        </div>
+
+        <!-- Member Profile Summary Card -->
+        <div class="glass-panel p-4 mb-4" style="border: 1px solid var(--border-cyan);">
+            <div class="row g-3">
+                <div class="col-md-3 col-sm-6">
+                    <span class="text-secondary small text-uppercase fw-semibold d-block">Member ID</span>
+                    <span class="fs-5 fw-bold text-white">#{{ member.id }}</span>
+                </div>
+                <div class="col-md-3 col-sm-6">
+                    <span class="text-secondary small text-uppercase fw-semibold d-block">Email</span>
+                    <span class="fs-6 text-cyan">{{ member.email }}</span>
+                </div>
+                <div class="col-md-3 col-sm-6">
+                    <span class="text-secondary small text-uppercase fw-semibold d-block">Phone</span>
+                    <span class="fs-6 text-white">{{ member.phone }}</span>
+                </div>
+                <div class="col-md-3 col-sm-6">
+                    <span class="text-secondary small text-uppercase fw-semibold d-block">Status</span>
+                    {% if member.membership_status == 'Active' %}
+                        <span class="badge-cyber badge-available">Active Account</span>
+                    {% else %}
+                        <span class="badge-cyber badge-overdue">{{ member.membership_status }}</span>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+
+        <!-- Loan History Table -->
+        <div class="glass-panel p-4 mb-4">
+            <h5 class="fw-bold text-white mb-3">
+                <i class="bi bi-journal-bookmark-fill text-info me-2"></i> All Borrowing Transactions ({{ history|length }})
+            </h5>
+
+            <div class="cyber-table-container">
+                <table class="cyber-table">
+                    <thead>
+                        <tr>
+                            <th>TX ID</th>
+                            <th>Book Title</th>
+                            <th>ISBN</th>
+                            <th>Issue Date</th>
+                            <th>Due Date</th>
+                            <th>Return Date</th>
+                            <th>Status</th>
+                            <th>Fine</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for tx in history %}
+                            <tr>
+                                <td class="text-secondary small fw-bold">#{{ tx.id }}</td>
+                                <td class="fw-bold text-white">{{ tx.book_title }}</td>
+                                <td class="small font-monospace text-secondary">{{ tx.isbn }}</td>
+                                <td class="small">{{ tx.issue_date }}</td>
+                                <td class="small">{{ tx.due_date }}</td>
+                                <td class="small text-secondary">{{ tx.return_date or 'Not Returned' }}</td>
+                                <td>
+                                    {% if tx.status == 'Returned' %}
+                                        <span class="badge-cyber badge-returned">Returned</span>
+                                    {% elif tx.status == 'Overdue' %}
+                                        <span class="badge-cyber badge-overdue">Overdue ({{ tx.overdue_days }}d)</span>
+                                    {% else %}
+                                        <span class="badge-cyber badge-issued">Issued</span>
+                                    {% endif %}
+                                </td>
+                                <td>
+                                    {% if tx.fine_amount > 0 %}
+                                        <span class="text-warning fw-bold">${{ "%.2f"|format(tx.fine_amount) }}</span>
+                                    {% else %}
+                                        <span class="text-muted small">$0.00</span>
+                                    {% endif %}
+                                </td>
+                            </tr>
+                        {% else %}
+                            <tr>
+                                <td colspan="8" class="text-center py-4 text-muted">No borrowing transactions on record for this member.</td>
+                            </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+    </section>
+
+</div>
+{% endblock %}

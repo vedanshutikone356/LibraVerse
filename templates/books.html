@@ -1,0 +1,229 @@
+{% extends "base.html" %}
+
+{% block title %}Explore Catalog — LibraVerse{% endblock %}
+
+{% block content %}
+<div class="container py-4 py-lg-5">
+    
+    <!-- Header & Search Controls -->
+    <div class="glass-panel p-4 mb-4 reveal">
+        <div class="row g-3 align-items-center">
+            <div class="col-lg-6">
+                <h1 class="h3 fw-bold mb-1 text-white">
+                    <i class="bi bi-collection-fill text-info me-2"></i> Book Catalog
+                </h1>
+                <p class="text-secondary small mb-0">
+                    Browse our expansive repository of {{ total }} curated volume{{ 's' if total != 1 else '' }}.
+                </p>
+            </div>
+            
+            <div class="col-lg-6">
+                <!-- Search Form -->
+                <form action="{{ url_for('books_catalog') }}" method="GET" class="d-flex gap-2">
+                    <input type="hidden" name="category" value="{{ current_category }}">
+                    <input type="hidden" name="availability" value="{{ current_availability }}">
+                    <input type="hidden" name="sort_by" value="{{ current_sort }}">
+                    <input type="hidden" name="order" value="{{ current_order }}">
+                    
+                    <div class="cyber-input-group flex-grow-1">
+                        <i class="bi bi-search text-secondary ms-3 me-2"></i>
+                        <input type="text" name="search" class="cyber-input border-0 bg-transparent text-white" 
+                               placeholder="Search title, author, ISBN..." value="{{ current_search }}">
+                        {% if current_search %}
+                            <a href="{{ url_for('books_catalog', category=current_category, availability=current_availability, sort_by=current_sort, order=current_order) }}" 
+                               class="text-secondary me-3" title="Clear search">
+                                <i class="bi bi-x-circle-fill"></i>
+                            </a>
+                        {% endif %}
+                    </div>
+                    <button type="submit" class="btn-cyber-primary px-3">
+                        <i class="bi bi-search"></i>
+                    </button>
+                </form>
+            </div>
+        </div>
+        
+        <!-- Filter and Sort Bar -->
+        <hr class="border-secondary border-opacity-25 my-3">
+        
+        <form action="{{ url_for('books_catalog') }}" method="GET" class="row g-2 align-items-center">
+            <input type="hidden" name="search" value="{{ current_search }}">
+            
+            <!-- Category Filter -->
+            <div class="col-md-3 col-sm-6">
+                <select name="category" class="cyber-input cyber-select small py-2" onchange="this.form.submit()">
+                    <option value="">All Categories</option>
+                    {% for cat in categories %}
+                        <option value="{{ cat }}" {% if current_category == cat %}selected{% endif %}>{{ cat }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+
+            <!-- Availability Filter -->
+            <div class="col-md-3 col-sm-6">
+                <select name="availability" class="cyber-input cyber-select small py-2" onchange="this.form.submit()">
+                    <option value="" {% if not current_availability %}selected{% endif %}>All Availabilities</option>
+                    <option value="available" {% if current_availability == 'available' %}selected{% endif %}>Available to Borrow</option>
+                    <option value="unavailable" {% if current_availability == 'unavailable' %}selected{% endif %}>Fully Checked Out</option>
+                </select>
+            </div>
+
+            <!-- Sort By -->
+            <div class="col-md-3 col-sm-6">
+                <select name="sort_by" class="cyber-input cyber-select small py-2" onchange="this.form.submit()">
+                    <option value="title" {% if current_sort == 'title' %}selected{% endif %}>Sort by Title</option>
+                    <option value="author" {% if current_sort == 'author' %}selected{% endif %}>Sort by Author</option>
+                    <option value="publication_year" {% if current_sort == 'publication_year' %}selected{% endif %}>Sort by Year</option>
+                    <option value="available_copies" {% if current_sort == 'available_copies' %}selected{% endif %}>Sort by Availability</option>
+                </select>
+            </div>
+
+            <!-- Sort Order -->
+            <div class="col-md-3 col-sm-6 d-flex gap-2">
+                <select name="order" class="cyber-input cyber-select small py-2" onchange="this.form.submit()">
+                    <option value="asc" {% if current_order == 'asc' %}selected{% endif %}>Ascending (A-Z, 0-9)</option>
+                    <option value="desc" {% if current_order == 'desc' %}selected{% endif %}>Descending (Z-A, 9-0)</option>
+                </select>
+                {% if current_search or current_category or current_availability %}
+                    <a href="{{ url_for('books_catalog') }}" class="btn-cyber-outline btn-cyber-sm py-2 px-3 text-nowrap" title="Reset all filters">
+                        <i class="bi bi-arrow-counterclockwise"></i>
+                    </a>
+                {% endif %}
+            </div>
+        </form>
+
+        <!-- Active Filter Badges -->
+        {% if current_search or current_category or current_availability %}
+            <div class="d-flex flex-wrap gap-2 mt-3 pt-2 border-top border-secondary border-opacity-10 align-items-center">
+                <span class="small text-secondary">Active Filters:</span>
+                {% if current_search %}
+                    <span class="badge-cyber badge-category">
+                        Search: "{{ current_search }}"
+                    </span>
+                {% endif %}
+                {% if current_category %}
+                    <span class="badge-cyber badge-category">
+                        Category: {{ current_category }}
+                    </span>
+                {% endif %}
+                {% if current_availability %}
+                    <span class="badge-cyber badge-category">
+                        Status: {{ current_availability|capitalize }}
+                    </span>
+                {% endif %}
+                <a href="{{ url_for('books_catalog') }}" class="text-danger small ms-2 text-decoration-none">
+                    <i class="bi bi-x-circle me-1"></i> Clear All
+                </a>
+            </div>
+        {% endif %}
+
+    </div>
+
+    <!-- Book Grid -->
+    {% if books %}
+        <div class="row g-4">
+            {% for book in books %}
+                <div class="col-xl-3 col-lg-4 col-sm-6 reveal reveal-delay-{{ (loop.index0 % 4 + 1) * 100 }}">
+                    <div class="card-3d-wrapper">
+                        <div class="card-3d card-3d-interactive p-3">
+                            <div class="card-3d-glare"></div>
+                            
+                            <!-- Cover Thumbnail -->
+                            <div class="position-relative rounded overflow-hidden shadow mb-3" style="height: 220px;">
+                                {% if book.cover_url %}
+                                    <img src="{{ book.cover_url }}" alt="{{ book.title }}" class="w-100 h-100 object-fit-cover" onerror="window.handleImageError(this, '{{ book.title }}', '{{ book.author }}')">
+                                {% endif %}
+                                <div class="fallback-cover" {% if book.cover_url %}style="display: none;"{% endif %}>
+                                    <div class="fallback-cover-cat">{{ book.category }}</div>
+                                    <div class="fallback-cover-title">{{ book.title }}</div>
+                                    <div class="fallback-cover-author">{{ book.author }}</div>
+                                </div>
+                                <span class="position-absolute top-0 end-0 m-2 badge-cyber {% if book.available_copies > 0 %}badge-available{% else %}badge-unavailable{% endif %} shadow">
+                                    {{ book.available_copies }} / {{ book.total_copies }}
+                                </span>
+                            </div>
+
+                            <!-- Details -->
+                            <div class="d-flex flex-column flex-grow-1 justify-content-between">
+                                <div class="card-layer-z1 mb-3">
+                                    <span class="badge-cyber badge-category small mb-2" style="font-size: 0.7rem;">{{ book.category }}</span>
+                                    <h5 class="fw-bold fs-6 mb-1 text-white text-truncate-2" title="{{ book.title }}">{{ book.title }}</h5>
+                                    <p class="text-secondary small mb-1">by {{ book.author }}</p>
+                                    <p class="text-muted small mb-0">{{ book.publication_year }} • {{ book.publisher }}</p>
+                                </div>
+
+                                <div class="card-layer-z2 pt-2 border-top border-secondary border-opacity-10 d-flex gap-2">
+                                    <button type="button" class="btn-cyber-primary btn-cyber-sm w-100 justify-content-center" data-open-modal data-book-id="{{ book.id }}">
+                                        <i class="bi bi-eye"></i> Quick View
+                                    </button>
+                                    <a href="{{ url_for('book_details', book_id=book.id) }}" class="btn-cyber-outline btn-cyber-sm px-3" title="Full Details">
+                                        <i class="bi bi-arrow-up-right"></i>
+                                    </a>
+                                </div>
+                            </div>
+
+                        </div>
+                    </div>
+                </div>
+            {% endfor %}
+        </div>
+
+        <!-- Pagination Controls -->
+        {% if total_pages > 1 %}
+            <div class="d-flex justify-content-center mt-5">
+                <nav aria-label="Catalog pagination">
+                    <ul class="pagination gap-1">
+                        <!-- Prev Page -->
+                        <li class="page-item {% if page <= 1 %}disabled{% endif %}">
+                            <a class="btn-cyber-outline btn-cyber-sm px-3" 
+                               href="{{ url_for('books_catalog', page=page-1, search=current_search, category=current_category, availability=current_availability, sort_by=current_sort, order=current_order) }}">
+                                <i class="bi bi-chevron-left"></i> Previous
+                            </a>
+                        </li>
+                        
+                        <!-- Page Indicators -->
+                        {% for p in range(1, total_pages + 1) %}
+                            {% if p == page %}
+                                <li class="page-item active">
+                                    <span class="btn-cyber-primary btn-cyber-sm px-3">{{ p }}</span>
+                                </li>
+                            {% elif p >= page - 2 and p <= page + 2 %}
+                                <li class="page-item">
+                                    <a class="btn-cyber-outline btn-cyber-sm px-3" 
+                                       href="{{ url_for('books_catalog', page=p, search=current_search, category=current_category, availability=current_availability, sort_by=current_sort, order=current_order) }}">
+                                        {{ p }}
+                                    </a>
+                                </li>
+                            {% endif %}
+                        {% endfor %}
+
+                        <!-- Next Page -->
+                        <li class="page-item {% if page >= total_pages %}disabled{% endif %}">
+                            <a class="btn-cyber-outline btn-cyber-sm px-3" 
+                               href="{{ url_for('books_catalog', page=page+1, search=current_search, category=current_category, availability=current_availability, sort_by=current_sort, order=current_order) }}">
+                                Next <i class="bi bi-chevron-right"></i>
+                            </a>
+                        </li>
+                    </ul>
+                </nav>
+            </div>
+        {% endif %}
+
+    {% else %}
+        <!-- Empty State -->
+        <div class="glass-panel p-5 text-center my-4 reveal">
+            <div class="d-inline-flex p-4 rounded-circle mb-3" style="background: rgba(139, 92, 246, 0.1); color: var(--accent-cyan);">
+                <i class="bi bi-search fs-1"></i>
+            </div>
+            <h3 class="fw-bold mb-2">No Matching Records Found</h3>
+            <p class="text-secondary mx-auto mb-4" style="max-width: 480px;">
+                We could not locate any book titles matching your current filter parameters. Try revising your query or resetting all filters.
+            </p>
+            <a href="{{ url_for('books_catalog') }}" class="btn-cyber-primary">
+                <i class="bi bi-arrow-counterclockwise"></i> Reset Search & Filters
+            </a>
+        </div>
+    {% endif %}
+
+</div>
+{% endblock %}
