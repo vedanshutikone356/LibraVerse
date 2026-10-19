@@ -52,12 +52,26 @@
 
             <!-- Demonstration Credentials Info Box -->
             <div class="p-3 rounded-3 mt-4" style="background: rgba(14, 14, 32, 0.85); border: 1px dashed rgba(139, 92, 246, 0.4);">
-                <div class="d-flex align-items-center gap-2 mb-1 text-info small fw-bold">
-                    <i class="bi bi-info-circle-fill"></i> Default System Credentials
+                <div class="d-flex align-items-center justify-content-between mb-2">
+                    <div class="text-info small fw-bold">
+                        <i class="bi bi-info-circle-fill me-1"></i> System Demo Credentials
+                    </div>
+                    <button type="button" class="btn btn-sm btn-cyber-cyan py-0 px-2" id="autoFillBtn" style="font-size: 0.75rem;">
+                        <i class="bi bi-magic me-1"></i> Auto-fill
+                    </button>
                 </div>
                 <div class="text-secondary small">
-                    <div>Username: <strong class="text-white">admin</strong></div>
-                    <div>Password: <strong class="text-white">Admin@LibraVerse2026</strong></div>
+                    <div class="d-flex justify-content-between mb-1">
+                        <span>Username:</span>
+                        <code class="text-white user-select-all bg-dark px-2 py-0 rounded">admin</code>
+                    </div>
+                    <div class="d-flex justify-content-between mb-1">
+                        <span>Password:</span>
+                        <code class="text-white user-select-all bg-dark px-2 py-0 rounded">Admin@LibraVerse2026</code>
+                    </div>
+                    <div class="text-muted mt-2" style="font-size: 0.75rem;">
+                        <i class="bi bi-check2"></i> Also accepted: <code>admin123</code> or <code>admin</code>
+                    </div>
                 </div>
             </div>
 
@@ -78,6 +92,19 @@
                 const isPassword = passInput.getAttribute('type') === 'password';
                 passInput.setAttribute('type', isPassword ? 'text' : 'password');
                 toggleBtn.innerHTML = isPassword ? '<i class="bi bi-eye-slash"></i>' : '<i class="bi bi-eye"></i>';
+            });
+        }
+
+        const autoFillBtn = document.getElementById('autoFillBtn');
+        const usernameInput = document.getElementById('usernameInput');
+        if (autoFillBtn && usernameInput && passInput) {
+            autoFillBtn.addEventListener('click', () => {
+                usernameInput.value = 'admin';
+                passInput.value = 'Admin@LibraVerse2026';
+                autoFillBtn.innerHTML = '<i class="bi bi-check2 text-emerald me-1"></i> Filled!';
+                setTimeout(() => {
+                    autoFillBtn.innerHTML = '<i class="bi bi-magic me-1"></i> Auto-fill';
+                }, 1500);
             });
         }
     });
