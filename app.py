@@ -47,6 +47,21 @@ def create_app(config_name=None):
     # Initialize database tables on app creation
     init_db(app.config['DATABASE'])
 
+    # Auto-seed sample catalog if books table is empty (e.g. freshly deployed on Render)
+    if not app.config.get('TESTING'):
+        try:
+            from database import get_connection
+            conn = get_connection(app.config['DATABASE'])
+            cur = conn.cursor()
+            cur.execute("SELECT COUNT(*) as count FROM books")
+            b_count = cur.fetchone()['count']
+            conn.close()
+            if b_count == 0:
+                from seed import seed_database
+                seed_database(app.config['DATABASE'])
+        except Exception as e:
+            print(f"[!] Auto-seed check: {e}")
+
     # Register teardown
     app.teardown_appcontext(close_db)
 
@@ -168,6 +183,14 @@ def create_app(config_name=None):
         logout_user()
         flash("You have been securely logged out.", "info")
         return redirect(url_for('index'))
+
+    @app.route('/setup-admin')
+    def setup_admin():
+        """Emergency administrative setup and catalog synchronization endpoint."""
+        from seed import seed_database
+        seed_database(app.config['DATABASE'])
+        flash("Administrator account and library catalog synchronized! You can now log in.", "success")
+        return redirect(url_for('login'))
 
     # ==========================================
     # PROTECTED ADMINISTRATOR ROUTES

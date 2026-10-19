@@ -107,6 +107,19 @@ def init_db(db_path=None):
     cursor.execute("CREATE INDEX IF NOT EXISTS idx_borrowings_book ON borrowings(book_id);")
     cursor.execute("CREATE INDEX IF NOT EXISTS idx_borrowings_member ON borrowings(member_id);")
 
+    # Ensure at least one default administrator exists
+    cursor.execute("SELECT COUNT(*) as count FROM admins")
+    if cursor.fetchone()['count'] == 0:
+        from werkzeug.security import generate_password_hash
+        admin_pwd = os.environ.get('ADMIN_PASSWORD', 'Admin@LibraVerse2026')
+        admin_user = os.environ.get('ADMIN_USERNAME', 'admin')
+        admin_email = os.environ.get('ADMIN_EMAIL', 'admin@libraverse.io')
+        pwd_hash = generate_password_hash(admin_pwd, method='scrypt')
+        cursor.execute("""
+            INSERT INTO admins (username, email, password_hash, full_name, role)
+            VALUES (?, ?, ?, ?, ?)
+        """, (admin_user, admin_email, pwd_hash, 'Chief Librarian Lyra', 'admin'))
+
     conn.commit()
     conn.close()
 
